@@ -39,12 +39,15 @@ func main() {
 
 	// Initialize repositories
 	userRepo := repositories.NewUserRepository(db)
+	postRepo := repositories.NewPostRepository(db)
 
 	// Initialize use cases
 	userUseCase := usecases.NewUserUseCase(userRepo)
+	postUseCase := usecases.NewPostUseCase(postRepo, userRepo)
 
 	// Initialize handlers
 	authHandler := handlers.NewAuthHandler(userUseCase, cfg)
+	postHandler := handlers.NewPostHandler(postUseCase)
 	userHandler := handlers.NewUserHandler(userUseCase)
 
 	// Initialize router
@@ -64,6 +67,14 @@ func main() {
 	// Public routes
 	api.HandleFunc("/auth/register", authHandler.Register).Methods("POST")
 	api.HandleFunc("/auth/login", authHandler.Login).Methods("POST")
+
+	api.HandleFunc("/posts", postHandler.GetPosts).Methods("GET")
+	api.HandleFunc("/posts", postHandler.CreatePost).Methods("POST")
+	api.HandleFunc("/posts/{id}", postHandler.GetPost).Methods("GET")
+	api.HandleFunc("/posts/{id}", postHandler.UpdatePost).Methods("PUT")
+	api.HandleFunc("/posts/{id}", postHandler.DeletePost).Methods("DELETE")
+	api.HandleFunc("/posts/{id}/like", postHandler.LikePost).Methods("POST")
+	api.HandleFunc("/posts/{id}/like", postHandler.UnlikePost).Methods("DELETE")
 
 	api.HandleFunc("/users/profile", userHandler.GetProfile).Methods("GET")
 	api.HandleFunc("/users/profile", userHandler.UpdateProfile).Methods("PUT")
