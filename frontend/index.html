@@ -9,43 +9,65 @@
 </head>
 <body>
     <header class="header">
-        <div class="container">
-            <div class="header-content">
-                <div class="logo">
-                    <i class="fas fa-music"></i>
-                    <h1>Forum Diapason</h1>
-                </div>
-                <nav class="nav">
-                    <a href="#" class="nav-link active" data-page="home">Accueil</a>
-                    <a href="#" class="nav-link" data-page="login">Connexion</a>
-                    <a href="#" class="nav-link" data-page="register">Inscription</a>
-                </nav>
-                <div class="user-menu" id="userMenu" style="display: none;">
-                    <span id="userPseudo"></span>
-                    <button id="logoutBtn" class="btn btn-secondary">Déconnexion</button>
-                </div>
+        <div class="container header-content">
+            <div class="brand">DIAPASON</div>
+            <div class="search-wrap">
+                <i class="fas fa-hashtag"></i>
+                <input type="text" placeholder="#tag, #tag, #tag, etc...">
+                <button class="icon-btn" aria-label="Filtrer">
+                    <i class="fas fa-filter"></i>
+                </button>
+            </div>
+            <nav class="nav">
+                <a href="#" class="nav-link" data-page="login">Sign in</a>
+                <a href="#" class="nav-link nav-link-dark" data-page="register">Register</a>
+                <button class="icon-btn">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </nav>
+            <div class="user-menu" id="userMenu" style="display: none;">
+                <span id="userPseudo"></span>
+                <button id="logoutBtn" class="btn btn-secondary">Déconnexion</button>
             </div>
         </div>
     </header>
 
     <main class="main">
         <div class="container">
-            <!-- Page d'accueil -->
             <div id="homePage" class="page active">
-                <div class="posts-header">
-                    <h2>Publications récentes</h2>
-                    <button id="createPostBtn" class="btn btn-primary" style="display: none;">
-                        <i class="fas fa-plus"></i> Nouvelle publication
-                    </button>
+                <div class="forum-layout">
+                    <aside class="left-panel">
+                        <div class="panel-title">CREER UN POST</div>
+                        <form id="createPostForm" class="compact-form">
+                            <input type="text" id="postTitle" placeholder="TITRE" required maxlength="200">
+                            <textarea id="postContent" placeholder="DESCRIPTION" required maxlength="10000" rows="4"></textarea>
+                            <input type="text" placeholder="TAG">
+                            <div class="tag-list">
+                                <span class="tag-pill">Tag <i class="fas fa-times"></i></span>
+                                <span class="tag-pill">Tag <i class="fas fa-times"></i></span>
+                                <span class="tag-pill">Tag <i class="fas fa-times"></i></span>
+                                <span class="tag-pill">Tag <i class="fas fa-times"></i></span>
+                            </div>
+                            <div class="form-actions">
+                                <button type="button" id="cancelPostBtn" class="btn btn-secondary">Cancel</button>
+                                <button type="submit" id="createPostBtn" class="btn btn-primary">Post</button>
+                            </div>
+                        </form>
+                    </aside>
+
+                    <section class="feed-panel">
+                        <div id="postsContainer" class="posts-container"></div>
+                        <div id="loading" class="loading">Chargement...</div>
+                        <button id="loadMoreBtn" class="btn btn-secondary" style="display: none;">Charger plus</button>
+                    </section>
+
+                    <aside class="right-panel">
+                        <div class="panel-title">TOP POST</div>
+                        <div id="topPostsContainer" class="top-posts"></div>
+                    </aside>
                 </div>
-                <div id="postsContainer" class="posts-container">
-                    <!-- Les posts seront chargés ici -->
-                </div>
-                <div id="loading" class="loading">Chargement...</div>
-                <button id="loadMoreBtn" class="btn btn-secondary" style="display: none;">Charger plus</button>
             </div>
 
-            <!-- Formulaire de connexion -->
             <div id="loginPage" class="page">
                 <div class="auth-form">
                     <h2>Connexion</h2>
@@ -84,27 +106,6 @@
                         <button type="submit" class="btn btn-primary">S'inscrire</button>
                     </form>
                     <p class="auth-link">Déjà un compte ? <a href="#" data-page="login">Se connecter</a></p>
-                </div>
-            </div>
-
-            <!-- Formulaire de création de post -->
-            <div id="createPostPage" class="page">
-                <div class="post-form">
-                    <h2>Nouvelle publication</h2>
-                    <form id="createPostForm">
-                        <div class="form-group">
-                            <label for="postTitle">Titre</label>
-                            <input type="text" id="postTitle" required maxlength="200">
-                        </div>
-                        <div class="form-group">
-                            <label for="postContent">Contenu</label>
-                            <textarea id="postContent" required maxlength="10000" rows="10"></textarea>
-                        </div>
-                        <div class="form-actions">
-                            <button type="button" id="cancelPostBtn" class="btn btn-secondary">Annuler</button>
-                            <button type="submit" class="btn btn-primary">Publier</button>
-                        </div>
-                    </form>
                 </div>
             </div>
         </div>
