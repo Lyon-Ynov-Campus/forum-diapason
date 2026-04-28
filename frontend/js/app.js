@@ -6,11 +6,15 @@ let currentUser = null;
 let currentPage = 'home';
 let postsOffset = 0;
 const POSTS_LIMIT = 20;
+let loadedPosts = [];
 
 // Utilitaires
 function showPage(pageId) {
     document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
-    document.getElementById(pageId + 'Page').classList.add('active');
+    const target = document.getElementById(pageId + 'Page');
+    if (target) {
+        target.classList.add('active');
+    }
     currentPage = pageId;
 }
 
@@ -113,14 +117,18 @@ function displayPosts(posts) {
     const container = document.getElementById('postsContainer');
 
     if (!posts || posts.length === 0) {
-        container.innerHTML = '<p>Aucune publication pour le moment.</p>';
+        if (!loadedPosts.length) {
+            container.innerHTML = '<p>Aucune publication pour le moment.</p>';
+        }
         return;
     }
 
+    loadedPosts = [...loadedPosts, ...posts];
     posts.forEach(post => {
         const postElement = createPostElement(post);
         container.appendChild(postElement);
     });
+    renderTopPosts();
 }
 
 function createPostElement(post) {
@@ -132,7 +140,7 @@ function createPostElement(post) {
                 <img src="${post.author_photo || 'https://via.placeholder.com/32'}" alt="Avatar" onerror="this.src='https://via.placeholder.com/32'">
                 <span>${post.author_pseudo}</span>
             </div>
-            <div class="post-meta">${new Date(post.created_at).toLocaleDateString('fr-FR')}</div>
+            <div class="post-meta">il y a ${timeAgo(post.created_at)}</div>
         </div>
         <h3 class="post-title">${post.title}</h3>
         <div class="post-content">${post.content}</div>
@@ -152,6 +160,42 @@ function createPostElement(post) {
     likeBtn.addEventListener('click', () => toggleLike(post.id, likeBtn));
 
     return postDiv;
+}
+
+function timeAgo(dateInput) {
+    const now = new Date();
+    const createdAt = new Date(dateInput);
+    const diffMs = now - createdAt;
+    const minutes = Math.max(1, Math.floor(diffMs / 60000));
+    if (minutes < 60) return `${minutes} minutes`;
+    const hours = Math.floor(minutes / 60);
+    if (hours < 24) return `${hours} heures`;
+    const days = Math.floor(hours / 24);
+    return `${days} jours`;
+}
+
+function renderTopPosts() {
+    const topPostsContainer = document.getElementById('topPostsContainer');
+    if (!topPostsContainer) return;
+
+    const topPosts = [...loadedPosts]
+        .sort((a, b) => (b.like_count || 0) - (a.like_count || 0))
+        .slice(0, 5);
+
+    if (!topPosts.length) {
+        topPostsContainer.innerHTML = '<p class="desc">Aucun top post pour le moment.</p>';
+        return;
+    }
+
+    topPostsContainer.innerHTML = topPosts
+        .map(post => `
+            <article class="top-post-item">
+                <div class="name">${post.author_pseudo || 'USER'}</div>
+                <div class="desc">${(post.content || '').slice(0, 40) || 'DESCRIPTION'}...</div>
+                <div class="post-meta"># y a ${timeAgo(post.created_at)}</div>
+            </article>
+        `)
+        .join('');
 }
 
 async function toggleLike(postId, button) {
@@ -201,6 +245,7 @@ async function handleLogin(event) {
         updateUserInterface();
         showPage('home');
         postsOffset = 0;
+        loadedPosts = [];
         document.getElementById('postsContainer').innerHTML = '';
         loadPosts();
         document.getElementById('loginForm').reset();
@@ -228,6 +273,7 @@ async function handleRegister(event) {
         updateUserInterface();
         showPage('home');
         postsOffset = 0;
+        loadedPosts = [];
         document.getElementById('postsContainer').innerHTML = '';
         loadPosts();
         document.getElementById('registerForm').reset();
@@ -250,9 +296,8 @@ async function handleCreatePost(event) {
         });
 
         document.getElementById('createPostForm').reset();
-        showPage('home');
-        // Recharger les posts
         postsOffset = 0;
+        loadedPosts = [];
         document.getElementById('postsContainer').innerHTML = '';
         loadPosts();
     } catch (error) {
@@ -267,6 +312,7 @@ function handleLogout() {
     updateUserInterface();
     showPage('home');
     postsOffset = 0;
+    loadedPosts = [];
     document.getElementById('postsContainer').innerHTML = '';
     loadPosts();
 }
@@ -297,8 +343,9 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('createPostForm')?.addEventListener('submit', handleCreatePost);
 
     // Boutons
-    document.getElementById('createPostBtn')?.addEventListener('click', () => showPage('createPost'));
-    document.getElementById('cancelPostBtn')?.addEventListener('click', () => showPage('home'));
+    document.getElementById('cancelPostBtn')?.addEventListener('click', () => {
+        document.getElementById('createPostForm')?.reset();
+    });
     document.getElementById('logoutBtn')?.addEventListener('click', handleLogout);
     document.getElementById('loadMoreBtn')?.addEventListener('click', loadPosts);
 
