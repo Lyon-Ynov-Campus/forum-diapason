@@ -55,6 +55,20 @@ forum-diapason/
 
 ## 🛠️ Installation et démarrage
 
+### Lancement rapide (depuis la racine)
+
+Depuis `forum-diapason/`, vous pouvez lancer le projet sans changer de dossier :
+
+```bash
+npm install
+npm run dev
+```
+
+Scripts disponibles à la racine :
+- `npm run dev` : lance frontend + backend en parallèle
+- `npm run dev:front` : lance uniquement le frontend
+- `npm run dev:back` : lance uniquement le backend
+
 ### Prérequis
 - Go 1.21+
 - Node.js 16+ (pour les outils frontend)
