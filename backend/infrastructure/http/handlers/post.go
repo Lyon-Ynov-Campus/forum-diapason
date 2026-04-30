@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"strconv"
 
-	"forum-diapason/usecases"
+	"forum-diapason/internal/usecases"
 
 	"github.com/gorilla/mux"
 )

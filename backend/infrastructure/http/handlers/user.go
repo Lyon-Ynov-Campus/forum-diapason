@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"forum-diapason/usecases"
+	"forum-diapason/internal/usecases"
 
 	"github.com/gorilla/mux"
 )

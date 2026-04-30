@@ -4,8 +4,8 @@ import (
 	"errors"
 	"strings"
 
-	"forum-diapason/internal/domain/entities"
-	"forum-diapason/internal/domain/repositories"
+	"forum-diapason/internal/entities"
+	"forum-diapason/internal/repositories"
 )
 
 type PostUseCase interface {

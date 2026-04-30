@@ -2,7 +2,7 @@ package repositories
 
 import (
 	"database/sql"
-	"forum-diapason/internal/domain/entities"
+	"forum-diapason/internal/entities"
 )
 
 type UserRepository interface {

@@ -29,17 +29,20 @@ Un forum musical moderne inspiré de Reddit, construit avec Go et JavaScript van
 ```
 forum-diapason/
 ├── backend/
-│   ├── cmd/api/             # Point d'entrée de l'API
+│   ├── cmd/
+│   │   ├── api/             # Serveur backend (API)
+│   │   ├── web/             # Serveur frontend (fichiers statiques)
+│   │   └── dev/             # Lance les 2 serveurs ensemble
 │   ├── infrastructure/
 │   │   ├── database/        # Connexion et migrations SQLite
 │   │   └── http/handlers/   # Gestionnaires HTTP
-│   ├── internal/domain/
+│   ├── internal/
 │   │   ├── entities/        # Modèles de données
-│   │   └── repositories/    # Contrats + implémentations données
+│   │   ├── repositories/    # Accès données (SQLite)
+│   │   └── usecases/        # Logique métier
 │   ├── pkg/
 │   │   ├── config/          # Configuration
 │   │   └── logger/          # Logging
-│   ├── usecases/            # Logique métier
 │   ├── go.mod
 │   └── Makefile
 ├── frontend/
@@ -60,18 +63,15 @@ forum-diapason/
 Depuis `forum-diapason/`, vous pouvez lancer le projet sans changer de dossier :
 
 ```bash
-npm install
-npm run dev
+go run ./backend/cmd/dev
 ```
 
-Scripts disponibles à la racine :
-- `npm run dev` : lance frontend + backend en parallèle
-- `npm run dev:front` : lance uniquement le frontend
-- `npm run dev:back` : lance uniquement le backend
+Cette commande lance en parallèle :
+- serveur backend API sur `http://localhost:8080`
+- serveur frontend statique sur `http://localhost:3000`
 
 ### Prérequis
 - Go 1.21+
-- Node.js 16+ (pour les outils frontend)
 - SQLite3
 
 ### Backend
@@ -95,13 +95,12 @@ Scripts disponibles à la racine :
 
 1. **Installer les dépendances**
    ```bash
-   cd frontend
-   npm install
+   # Aucune dépendance Node.js nécessaire pour servir le frontend en local
    ```
 
 2. **Démarrer le serveur de développement**
    ```bash
-   npm run dev
+   go run ./backend/cmd/web
    ```
 
    Ouvrez `http://localhost:3000` dans votre navigateur
@@ -178,12 +177,10 @@ make build
 
 ### Frontend
 ```bash
-cd frontend
-npm run build
-# Servir les fichiers statiques
+go run ./backend/cmd/web
 ```
 
-Statut actuel: script de build placeholder (pipeline de production à finaliser).
+Statut actuel: le frontend est servi comme fichiers statiques via un serveur Go dédié.
 
 ## 🧭 Processus projet et gouvernance
 

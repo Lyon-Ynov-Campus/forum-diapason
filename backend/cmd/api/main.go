@@ -11,10 +11,10 @@ import (
 
 	"forum-diapason/infrastructure/database"
 	"forum-diapason/infrastructure/http/handlers"
-	"forum-diapason/internal/domain/repositories"
+	"forum-diapason/internal/repositories"
+	"forum-diapason/internal/usecases"
 	"forum-diapason/pkg/config"
 	"forum-diapason/pkg/logger"
-	"forum-diapason/usecases"
 
 	"github.com/gorilla/mux"
 	"github.com/rs/cors"
