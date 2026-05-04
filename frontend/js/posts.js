@@ -9,14 +9,20 @@ function timeAgo(dateStr) {
 
 function createPostCard(post) {
     const card = document.getElementById('post-card').content.cloneNode(true)
-
     card.querySelector('.post-author').textContent = post.author
     card.querySelector('.post-title').textContent = post.title
     card.querySelector('.post-content').textContent = post.content
     card.querySelector('.post-date').textContent = timeAgo(post.created_at)
     card.querySelector('.post-tags').textContent = (post.tags || []).map(t => `#${t}`).join(' ')
     card.querySelector('.post-likes').textContent = post.likes
+    return card
+}
 
+function createTopPostCard(post) {
+    const card = document.getElementById('top-post-card').content.cloneNode(true)
+    card.querySelector('.top-post-author').textContent = post.author
+    card.querySelector('.top-post-content').textContent = post.content
+    card.querySelector('.top-post-date').textContent = timeAgo(post.created_at)
     return card
 }
 
@@ -25,4 +31,10 @@ fetch('/data/posts.json')
     .then(posts => {
         const container = document.getElementById('posts-container')
         posts.forEach(post => container.appendChild(createPostCard(post)))
+
+        const topContainer = document.getElementById('top-posts-container')
+        ;[...posts]
+            .sort((a, b) => b.likes - a.likes)
+            .slice(0, 6)
+            .forEach(post => topContainer.appendChild(createTopPostCard(post)))
     })
