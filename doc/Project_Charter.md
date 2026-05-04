@@ -40,7 +40,7 @@ Le site doit être accessible au grand public et entièrement déployé pour la 
 
 | Rôle | Nom | Attentes |
 |------|-----|----------|
-| Client | Mentor *(à compléter)* | Un forum fonctionnel livré dans les délais, avec une gestion de projet suivie sur Jira |
+| Client | Mentor Kilian MOUN | Un forum fonctionnel livré dans les délais, avec une gestion de projet suivie sur Jira |
 | Utilisateurs finaux | Grand public | Un site ergonomique, rapide et agréable à utiliser depuis un navigateur |
 
 ---
@@ -49,10 +49,10 @@ Le site doit être accessible au grand public et entièrement déployé pour la 
 
 | Nom | Domaines principaux | Critères de performance |
 |-----|---------------------|------------------------|
-| Joaquin Cozette | Gestion de projet, suivi Jira, wireframe | Tâches à jour sur Jira, wireframe livré avant le 30/04 |
-| PHAM Huy | Design (maquette Figma), développement front-end | Maquette finalisée en semaine 1, pages conformes au design |
+| Joaquin COZETTE | Gestion de projet, suivi Jira, wireframe | Tâches à jour sur Jira, wireframe livré avant le 30/04 |
+| Quochuy PHAM | Design (maquette Figma), développement front-end | Maquette finalisée en semaine 1, pages conformes au design |
 | Michel LEVINE | Développement back-end, API Golang, base de données SQLite, déploiement, documentation | API fonctionnelle, JWT opérationnel, site déployé, documents rendus |
-| ANDRY Nomenafitia | Développement front-end, CSS, documentation utilisateur | Pages implémentées, design responsive, documentation rédigée |
+| Nomenafitia ANDRY | Développement front-end, CSS, documentation utilisateur | Pages implémentées, design responsive, documentation rédigée |
 
 ---
 
@@ -99,7 +99,6 @@ Les tâches sont toutes suivies dans Jira sur le Tableau Sprint 1.
 
 | Ressource | Détail |
 |-----------|--------|
-| Budget | 0 € |
 | Équipe | 4 membres |
 | Durée | 11 jours ouvrés |
 | Outils | GitHub Classroom, Jira, Excalidraw, Figma, VS Code |

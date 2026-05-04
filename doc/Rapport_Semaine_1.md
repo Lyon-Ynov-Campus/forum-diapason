@@ -19,17 +19,17 @@ Cette première semaine a été consacrée à la mise en place du projet et aux 
 |-------|-------------|--------|-----------|
 | Création et configuration du dépôt GitHub | Michel LEVINE | ✅ Terminé | [forum-diapason](https://github.com/Lyon-Ynov-Campus/forum-diapason) |
 | Configuration Jira et découpage des tâches | Michel LEVINE | ✅ Terminé | 35 tickets créés, Tableau Sprint 1 configuré |
-| Wireframe (Excalidraw) | Joaquin Cozette | ✅ Terminé | Toutes les pages principales esquissées |
+| Wireframe (Excalidraw) | Joaquin COZETTE | ✅ Terminé | Toutes les pages principales esquissées |
 | Maquette base de données (DrawIO) | Michel LEVINE | ✅ Terminé | Schéma users, posts, comments et likes |
 | Navbar composant (HTML) | Michel LEVINE | ✅ Terminé | |
-| Maquette web (Figma) | PHAM Huy et ANDRY Nomenafitia | 🔄 En cours | Page d'accueil et page compte avancées |
-| Page principale (HTML) | PHAM Huy et ANDRY Nomenafitia | 🔄 En cours | |
+| Maquette web (Figma) | Quochuy PHAM et ANDRY Nomenafitia | 🔄 En cours | Page d'accueil et page compte avancées |
+| Page principale (HTML) | Quochuy PHAM et ANDRY Nomenafitia | 🔄 En cours | |
 | Déploiement continu | Michel LEVINE | 🔄 En cours | Infrastructure initiée |
 | Charte de projet | Michel LEVINE | 🔄 En cours | |
 | Spécification fonctionnelle | Équipe | 🔄 En cours | ~20% complété |
 | Authentification back-end (JWT) | Michel LEVINE | 🔄 En cours | |
 | Modification et suppression de profil | Michel LEVINE | 🔄 En cours | |
-| Structure HTML (footer et pages secondaires) | PHAM Huy et ANDRY Nomenafitia | 🔄 En cours | |
+| Structure HTML (footer et pages secondaires) | Quochuy PHAM et ANDRY Nomenafitia | 🔄 En cours | |
 
 ---
 
