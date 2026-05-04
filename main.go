@@ -46,6 +46,9 @@ func main() {
 	http.HandleFunc("/register", func(w http.ResponseWriter, r *http.Request) {
 		page("register").ExecuteTemplate(w, "register.html", nil)
 	})
+	http.HandleFunc("/profile", func(w http.ResponseWriter, r *http.Request) {
+		page("profile").ExecuteTemplate(w, "profile.html", nil)
+	})
 	http.HandleFunc("/post", func(w http.ResponseWriter, r *http.Request) {
 		page("post").ExecuteTemplate(w, "post.html", nil)
 	})
