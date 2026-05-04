@@ -12,3 +12,7 @@ forum-diapason
 
 # Go
 vendor/
+
+# Tailwind
+tailwindcss
+frontend/css/styles.css

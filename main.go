@@ -1,6 +1,7 @@
 package main
 
 import (
+	"html/template"
 	"log"
 	"net/http"
 	"os"
@@ -8,6 +9,12 @@ import (
 	"forum-diapason/database"
 	"forum-diapason/handlers"
 )
+
+// page charge une page et tous les composants réutilisables
+func page(name string) *template.Template {
+	t := template.Must(template.ParseGlob("./frontend/components/*.html"))
+	return template.Must(t.ParseFiles("./frontend/pages/" + name + ".html"))
+}
 
 func getEnv(key, fallback string) string {
 	if v := os.Getenv(key); v != "" {
@@ -31,7 +38,16 @@ func main() {
 			http.NotFound(w, r)
 			return
 		}
-		http.ServeFile(w, r, "./frontend/index.html")
+		page("home").ExecuteTemplate(w, "home.html", nil)
+	})
+	http.HandleFunc("/login", func(w http.ResponseWriter, r *http.Request) {
+		page("login").ExecuteTemplate(w, "login.html", nil)
+	})
+	http.HandleFunc("/register", func(w http.ResponseWriter, r *http.Request) {
+		page("register").ExecuteTemplate(w, "register.html", nil)
+	})
+	http.HandleFunc("/post", func(w http.ResponseWriter, r *http.Request) {
+		page("post").ExecuteTemplate(w, "post.html", nil)
 	})
 
 	// API — à compléter
