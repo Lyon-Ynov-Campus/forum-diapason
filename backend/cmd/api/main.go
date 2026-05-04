@@ -53,6 +53,11 @@ func main() {
 	// Initialize router
 	router := mux.NewRouter()
 
+	// Redirect root to frontend dev server
+	router.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		http.Redirect(w, r, "http://localhost:3000", http.StatusTemporaryRedirect)
+	})
+
 	// CORS middleware
 	c := cors.New(cors.Options{
 		AllowedOrigins:   []string{"http://localhost:3000", "http://127.0.0.1:3000"},

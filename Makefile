@@ -8,4 +8,4 @@ help:
 
 run-all:
 	@echo "Starting backend and frontend..."
-	@bash -c 'cd backend && go run ./cmd/api & BACKEND=$$!; cd ../frontend && npm run dev & FRONTEND=$$!; trap "kill $$BACKEND $$FRONTEND" INT TERM; wait $$BACKEND $$FRONTEND'
+	@bash -lc 'set -e; ROOT="$$(pwd)"; cd "$$ROOT/backend"; go run ./cmd/api & BACKEND=$$!; cd "$$ROOT/frontend"; npm run dev & FRONTEND=$$!; trap "kill $$BACKEND $$FRONTEND" INT TERM; wait $$BACKEND $$FRONTEND'
