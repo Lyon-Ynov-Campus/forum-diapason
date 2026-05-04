@@ -57,6 +57,7 @@ func main() {
 	// Fichiers statiques
 	http.Handle("/css/", http.FileServer(http.Dir("./frontend/")))
 	http.Handle("/js/", http.FileServer(http.Dir("./frontend/")))
+	http.Handle("/data/", http.FileServer(http.Dir("./frontend/")))
 
 	log.Println("Serveur lancé sur http://localhost:" + port)
 	log.Fatal(http.ListenAndServe(":"+port, nil))
