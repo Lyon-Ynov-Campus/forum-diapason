@@ -29,26 +29,29 @@ Un forum musical moderne inspiré de Reddit, construit avec Go et JavaScript van
 ```
 forum-diapason/
 ├── backend/
-│   ├── cmd/api/             # Point d'entrée de l'API
-│   ├── infrastructure/
-│   │   ├── database/        # Connexion et migrations SQLite
-│   │   └── http/handlers/   # Gestionnaires HTTP
-│   ├── internal/domain/
-│   │   ├── entities/        # Modèles de données
-│   │   └── repositories/    # Contrats + implémentations données
+│   ├── cmd/api/           # Point d'entrée de l'API
+│   ├── internal/
+│   │   ├── domain/
+│   │   │   ├── entities/  # Modèles de données
+│   │   │   └── repositories/ # Interfaces de données
+│   │   └── infrastructure/
+│   │       ├── database/  # Connexion et migrations
+│   │       └── http/handlers/ # Gestionnaires HTTP
 │   ├── pkg/
-│   │   ├── config/          # Configuration
-│   │   └── logger/          # Logging
-│   ├── usecases/            # Logique métier
+│   │   ├── config/        # Configuration
+│   │   └── logger/        # Logging
+│   ├── usecases/          # Logique métier
 │   ├── go.mod
 │   └── Makefile
 ├── frontend/
-│   ├── index.html
-│   ├── css/styles.css
-│   ├── js/app.js
+│   ├── src/
+│   │   ├── html/          # Templates HTML
+│   │   ├── css/           # Styles
+│   │   └── js/            # JavaScript
 │   └── package.json
-├── docs/                    # Documentation
-├── .env.example
+├── docs/                  # Documentation
+├── tests/                 # Tests
+├── migrations/            # Scripts de migration
 ├── .gitignore
 └── README.md
 ```
@@ -96,7 +99,7 @@ forum-diapason/
 
 ### Variables d'environnement
 
-Créez un fichier `.env` dans le dossier `backend/` en vous basant sur `backend/.env.example` :
+Créez un fichier `.env` dans le dossier `backend/` :
 
 ```env
 PORT=8080
