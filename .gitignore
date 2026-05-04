@@ -1,38 +1,14 @@
-# Backend
-backend/bin/
-backend/*.db
-backend/*.db-shm
-backend/*.db-wal
-backend/.env
-backend/.env.local
-backend/dist
+# Binaire
+forum-diapason
+*.exe
 
-# Frontend
-frontend/node_modules/
-frontend/dist/
-frontend/.env
-frontend/.env.local
-frontend/package-lock.json
-frontend/yarn.lock
+# Base de données
+*.db
+*.db-shm
+*.db-wal
 
-# IDE
-.vscode/
-.idea/
-*.swp
-*.swo
-*~
-.DS_Store
-*.log
+# Environnement
+.env
 
-# OS
-.DS_Store
-Thumbs.db
-
-# Build
-*.o
-*.a
-*.so
-
-# Test coverage
-coverage/
-*.coverage
+# Go
+vendor/
