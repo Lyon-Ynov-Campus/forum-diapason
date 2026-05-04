@@ -8,12 +8,14 @@
 </head>
 <body>
     {{template "header" .}}
+    {{template "post-card" .}}
 
-    <main>
-        <!-- contenu de la page d'accueil -->
+    <main class="max-w-2xl mx-auto py-8 px-4">
+        <div id="posts-container" class="flex flex-col gap-4"></div>
     </main>
 
     {{template "footer" .}}
     <script src="/js/app.js"></script>
+    <script src="/js/posts.js"></script>
 </body>
 </html>

@@ -13,7 +13,7 @@ import (
 // page charge une page et tous les composants réutilisables
 func page(name string) *template.Template {
 	t := template.Must(template.ParseGlob("./frontend/components/*.html"))
-	return template.Must(t.ParseFiles("./frontend/pages/" + name + ".html"))
+	return template.Must(t.ParseFiles("./frontend/pages/"+name+".html"))
 }
 
 func getEnv(key, fallback string) string {

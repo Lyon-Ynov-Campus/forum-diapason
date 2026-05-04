@@ -1,7 +1,9 @@
+TAILWIND_CONTENT = "./frontend/**/*.html,./frontend/**/*.js"
+
 dev:
-	@./tailwindcss -i ./frontend/css/input.css -o ./frontend/css/styles.css --watch --content "./frontend/**/*.html" &
+	@./tailwindcss -i ./frontend/css/input.css -o ./frontend/css/styles.css --watch --content $(TAILWIND_CONTENT) &
 	@air
 
 build:
-	@./tailwindcss -i ./frontend/css/input.css -o ./frontend/css/styles.css --minify --content "./frontend/**/*.html"
+	@./tailwindcss -i ./frontend/css/input.css -o ./frontend/css/styles.css --minify --content $(TAILWIND_CONTENT)
 	@go build -o forum-diapason .
