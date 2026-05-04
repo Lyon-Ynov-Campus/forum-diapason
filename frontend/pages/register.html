@@ -1,16 +1,58 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="fr" class="h-full">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Inscription — Forum Diapason</title>
     <link rel="stylesheet" href="/css/styles.css">
 </head>
-<body>
+<body class="flex flex-col min-h-screen">
     {{template "header" .}}
 
-    <main>
-        <!-- formulaire d'inscription -->
+    <main class="flex-1 flex items-center justify-center gap-16 px-8">
+
+        <div class="bg-gray-100 flex flex-col items-center justify-center gap-12 shrink-0 w-[420px] h-[440px]">
+            <span class="text-4xl font-bold">Diapason</span>
+            <div class="w-36 h-36 flex items-center justify-center bg-black">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
+                </svg>
+            </div>
+        </div>
+
+        <form class="flex flex-col gap-4 w-80">
+
+            <div class="flex flex-col gap-1">
+                <label class="text-sm text-gray-700">Email ou n°</label>
+                <input type="text" placeholder="Email ou n°"
+                    class="border border-gray-300 px-4 py-2.5 text-sm outline-none focus:border-gray-500 placeholder:text-gray-400 w-full">
+            </div>
+
+            <div class="flex flex-col gap-1">
+                <label class="text-sm text-gray-700">Mot de passe</label>
+                <input type="password" placeholder="Mot de passe"
+                    class="border border-gray-300 px-4 py-2.5 text-sm outline-none focus:border-gray-500 placeholder:text-gray-400 w-full">
+            </div>
+
+            <div class="flex flex-col gap-1">
+                <label class="text-sm text-gray-700">Confirmer mot de passe</label>
+                <input type="password" placeholder="Confirmer mot de passe"
+                    class="border border-gray-300 px-4 py-2.5 text-sm outline-none focus:border-gray-500 placeholder:text-gray-400 w-full">
+            </div>
+
+            <div class="flex flex-col gap-1">
+                <label class="text-sm text-gray-700">Pseudo</label>
+                <input type="text" placeholder="Pseudo"
+                    class="border border-gray-300 px-4 py-2.5 text-sm outline-none focus:border-gray-500 placeholder:text-gray-400 w-full">
+            </div>
+
+            <button type="submit"
+                class="bg-gray-200 text-gray-700 py-2.5 text-sm hover:bg-gray-300 transition-colors w-full mt-1">
+                Register
+            </button>
+
+        </form>
+
     </main>
 
     {{template "footer" .}}
