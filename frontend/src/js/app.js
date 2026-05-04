@@ -93,17 +93,17 @@ async function loadPosts() {
     try {
         showLoading();
         const posts = await apiRequest(`/posts?limit=${POSTS_LIMIT}&offset=${postsOffset}`);
-        displayPosts(posts || []);
+        displayPosts(posts);
         postsOffset += POSTS_LIMIT;
 
-        if (posts && posts.length === POSTS_LIMIT) {
+        if (posts.length === POSTS_LIMIT) {
             document.getElementById('loadMoreBtn').style.display = 'block';
         } else {
             document.getElementById('loadMoreBtn').style.display = 'none';
         }
     } catch (error) {
-        console.error('Erreur lors du chargement des posts:', error);
-        document.getElementById('postsContainer').innerHTML = '<p>Impossible de charger les publications. Assurez-vous que le serveur backend est lancé.</p>';
+        showError('Impossible de charger les publications');
+        console.error(error);
     } finally {
         hideLoading();
     }
@@ -111,11 +111,6 @@ async function loadPosts() {
 
 function displayPosts(posts) {
     const container = document.getElementById('postsContainer');
-
-    if (!posts || posts.length === 0) {
-        container.innerHTML = '<p>Aucune publication pour le moment.</p>';
-        return;
-    }
 
     posts.forEach(post => {
         const postElement = createPostElement(post);
@@ -129,7 +124,7 @@ function createPostElement(post) {
     postDiv.innerHTML = `
         <div class="post-header">
             <div class="post-author">
-                <img src="${post.author_photo || 'https://via.placeholder.com/32'}" alt="Avatar" onerror="this.src='https://via.placeholder.com/32'">
+                <img src="${post.author_photo || '/default-avatar.png'}" alt="Avatar">
                 <span>${post.author_pseudo}</span>
             </div>
             <div class="post-meta">${new Date(post.created_at).toLocaleDateString('fr-FR')}</div>
@@ -200,12 +195,9 @@ async function handleLogin(event) {
         currentUser = response.user;
         updateUserInterface();
         showPage('home');
-        postsOffset = 0;
-        document.getElementById('postsContainer').innerHTML = '';
         loadPosts();
-        document.getElementById('loginForm').reset();
     } catch (error) {
-        showError('Échec de la connexion: ' + error.message);
+        showError('Échec de la connexion');
         console.error(error);
     }
 }
@@ -227,12 +219,9 @@ async function handleRegister(event) {
         currentUser = response.user;
         updateUserInterface();
         showPage('home');
-        postsOffset = 0;
-        document.getElementById('postsContainer').innerHTML = '';
         loadPosts();
-        document.getElementById('registerForm').reset();
     } catch (error) {
-        showError('Échec de l\'inscription: ' + error.message);
+        showError('Échec de l\'inscription');
         console.error(error);
     }
 }
@@ -256,7 +245,7 @@ async function handleCreatePost(event) {
         document.getElementById('postsContainer').innerHTML = '';
         loadPosts();
     } catch (error) {
-        showError('Impossible de créer la publication: ' + error.message);
+        showError('Impossible de créer la publication');
         console.error(error);
     }
 }
@@ -292,15 +281,15 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Gestionnaires de formulaires
-    document.getElementById('loginForm')?.addEventListener('submit', handleLogin);
-    document.getElementById('registerForm')?.addEventListener('submit', handleRegister);
-    document.getElementById('createPostForm')?.addEventListener('submit', handleCreatePost);
+    document.getElementById('loginForm').addEventListener('submit', handleLogin);
+    document.getElementById('registerForm').addEventListener('submit', handleRegister);
+    document.getElementById('createPostForm').addEventListener('submit', handleCreatePost);
 
     // Boutons
-    document.getElementById('createPostBtn')?.addEventListener('click', () => showPage('createPost'));
-    document.getElementById('cancelPostBtn')?.addEventListener('click', () => showPage('home'));
-    document.getElementById('logoutBtn')?.addEventListener('click', handleLogout);
-    document.getElementById('loadMoreBtn')?.addEventListener('click', loadPosts);
+    document.getElementById('createPostBtn').addEventListener('click', () => showPage('createPost'));
+    document.getElementById('cancelPostBtn').addEventListener('click', () => showPage('home'));
+    document.getElementById('logoutBtn').addEventListener('click', handleLogout);
+    document.getElementById('loadMoreBtn').addEventListener('click', loadPosts);
 
     // Charger les posts initiaux
     loadPosts();

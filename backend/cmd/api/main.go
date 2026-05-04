@@ -11,10 +11,10 @@ import (
 
 	"forum-diapason/infrastructure/database"
 	"forum-diapason/infrastructure/http/handlers"
-	"forum-diapason/internal/repositories"
-	"forum-diapason/internal/usecases"
+	"forum-diapason/internal/domain/repositories"
 	"forum-diapason/pkg/config"
 	"forum-diapason/pkg/logger"
+	"forum-diapason/usecases"
 
 	"github.com/gorilla/mux"
 	"github.com/rs/cors"
@@ -68,6 +68,7 @@ func main() {
 	api.HandleFunc("/auth/register", authHandler.Register).Methods("POST")
 	api.HandleFunc("/auth/login", authHandler.Login).Methods("POST")
 
+	// Protected routes (would need JWT middleware)
 	api.HandleFunc("/posts", postHandler.GetPosts).Methods("GET")
 	api.HandleFunc("/posts", postHandler.CreatePost).Methods("POST")
 	api.HandleFunc("/posts/{id}", postHandler.GetPost).Methods("GET")

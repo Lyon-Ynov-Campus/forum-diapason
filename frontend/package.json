@@ -2,7 +2,7 @@
   "name": "forum-diapason-frontend",
   "version": "1.0.0",
   "description": "Frontend pour Forum Diapason - Forum musical inspiré de Reddit",
-  "main": "js/app.js",
+  "main": "src/js/app.js",
   "scripts": {
     "dev": "live-server --port=3000 --host=localhost",
     "build": "echo 'Build process for production'",

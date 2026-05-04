@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"forum-diapason/pkg/config"
-	"forum-diapason/internal/usecases"
+	"forum-diapason/usecases"
 
 	"github.com/golang-jwt/jwt/v5"
 )
