@@ -9,10 +9,23 @@
 <body>
     {{template "header" .}}
     {{template "post-card" .}}
+    {{template "top-post-card" .}}
 
-    <main class="max-w-2xl mx-auto py-8 px-4">
+    <div class="grid grid-cols-[200px_1fr_200px] gap-4 px-6 py-6">
+
+        <!-- Colonne gauche : créer un post -->
+        {{template "create-post" .}}
+
+        <!-- Colonne centre : feed -->
         <div id="posts-container" class="flex flex-col gap-4"></div>
-    </main>
+
+        <!-- Colonne droite : top posts -->
+        <aside class="sticky top-4 self-start border border-gray-200">
+            <h2 class="font-bold text-xs text-center py-2 border-b border-gray-200">TOP POST</h2>
+            <div id="top-posts-container" class="flex flex-col"></div>
+        </aside>
+
+    </div>
 
     {{template "footer" .}}
     <script src="/js/app.js"></script>
