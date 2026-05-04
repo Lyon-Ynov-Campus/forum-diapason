@@ -1,0 +1,38 @@
+# Backend
+backend/bin/
+backend/*.db
+backend/*.db-shm
+backend/*.db-wal
+backend/.env
+backend/.env.local
+backend/dist
+
+# Frontend
+frontend/node_modules/
+frontend/dist/
+frontend/.env
+frontend/.env.local
+frontend/package-lock.json
+frontend/yarn.lock
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Build
+*.o
+*.a
+*.so
+
+# Test coverage
+coverage/
+*.coverage
