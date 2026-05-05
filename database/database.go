@@ -1,7 +1,5 @@
 package database
 
-// Ajouter les tables dans runMigrations() au fur et à mesure.
-
 import (
 	"database/sql"
 	"log"
@@ -24,10 +22,9 @@ func Init(path string) *sql.DB {
 func runMigrations(db *sql.DB) {
 	queries := []string{
 
-		// Active les clés étrangères (obligatoire avec SQLite)
 		`PRAGMA foreign_keys = ON`,
 
-		// ── USERS ─────────────────────────────────────────────────────────────
+		//USERS
 		`CREATE TABLE IF NOT EXISTS users (
 			id         INTEGER  PRIMARY KEY AUTOINCREMENT,
 			nom        TEXT     NOT NULL,
@@ -38,6 +35,7 @@ func runMigrations(db *sql.DB) {
 			created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 		)`,
 
+		// SESSIONS 
 		`CREATE TABLE IF NOT EXISTS sessions (
 			id         TEXT     PRIMARY KEY,
 			user_id    INTEGER  NOT NULL REFERENCES users(id) ON DELETE CASCADE,
@@ -47,7 +45,7 @@ func runMigrations(db *sql.DB) {
 		`CREATE INDEX IF NOT EXISTS idx_sessions_user_id    ON sessions(user_id)`,
 		`CREATE INDEX IF NOT EXISTS idx_sessions_expires_at ON sessions(expires_at)`,
 
-		// ── POSTS ─────────────────────────────────────────────────────────────
+		//POSTS
 		`CREATE TABLE IF NOT EXISTS posts (
 			id               INTEGER  PRIMARY KEY AUTOINCREMENT,
 			user_id          INTEGER  NOT NULL REFERENCES users(id) ON DELETE CASCADE,
@@ -59,8 +57,7 @@ func runMigrations(db *sql.DB) {
 		`CREATE INDEX IF NOT EXISTS idx_posts_user_id          ON posts(user_id)`,
 		`CREATE INDEX IF NOT EXISTS idx_posts_date_publication ON posts(date_publication DESC)`,
 
-		// ── COMMENTS ──────────────────────────────────────────────────────────
-		// Suppression d'un post → CASCADE supprime ses commentaires
+		// COMMENTS 
 		`CREATE TABLE IF NOT EXISTS comments (
 			id       INTEGER  PRIMARY KEY AUTOINCREMENT,
 			posts_id INTEGER  NOT NULL REFERENCES posts(id) ON DELETE CASCADE,
@@ -71,7 +68,7 @@ func runMigrations(db *sql.DB) {
 		`CREATE INDEX IF NOT EXISTS idx_comments_posts_id ON comments(posts_id)`,
 		`CREATE INDEX IF NOT EXISTS idx_comments_user_id  ON comments(user_id)`,
 
-		
+		// LIKES
 		`CREATE TABLE IF NOT EXISTS likes (
 			user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
 			post_id INTEGER NOT NULL REFERENCES posts(id) ON DELETE CASCADE,
@@ -79,12 +76,13 @@ func runMigrations(db *sql.DB) {
 		)`,
 		`CREATE INDEX IF NOT EXISTS idx_likes_post_id ON likes(post_id)`,
 
-		// ── TAGS ──────────────────────────────────────────────────────────────
+		//TAGS 
 		`CREATE TABLE IF NOT EXISTS tags (
 			id  INTEGER PRIMARY KEY AUTOINCREMENT,
 			nom TEXT    NOT NULL UNIQUE COLLATE NOCASE
 		)`,
 
+		// POST_TAGS 
 		`CREATE TABLE IF NOT EXISTS post_tags (
 			post_id INTEGER NOT NULL REFERENCES posts(id) ON DELETE CASCADE,
 			tag_id  INTEGER NOT NULL REFERENCES tags(id)  ON DELETE CASCADE,
@@ -92,6 +90,7 @@ func runMigrations(db *sql.DB) {
 		)`,
 		`CREATE INDEX IF NOT EXISTS idx_post_tags_tag_id ON post_tags(tag_id)`,
 
+		//FOLLOWS 
 		`CREATE TABLE IF NOT EXISTS follows (
 			follower_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
 			followed_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
