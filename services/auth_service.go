@@ -121,7 +121,8 @@ func Logout(db *sql.DB, w http.ResponseWriter, r *http.Request) {
 	utils.ClearSessionCookie(w)
 }
 
-// DeleteExpiredSessions à appeler périodiquement (ex: goroutine au démarrage)
+// DeleteExpiredSessions 
+// À appeler périodiquement (ex: goroutine au démarrage)
 func DeleteExpiredSessions(db *sql.DB) {
 	db.Exec(`DELETE FROM sessions WHERE expires_at <= datetime('now')`)
 }
