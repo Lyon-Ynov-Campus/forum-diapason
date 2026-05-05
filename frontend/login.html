@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Connexion - Diapason</title>
+  <link rel="stylesheet" href="/css/style.css" />
+</head>
+<body>
+  <div class="page auth-page">
+    <header class="topbar login-topbar">
+      <a href="/" class="brand" style="text-decoration: none; color: inherit;">
+        <div class="brand-logo">D</div>
+        <div>
+          <p class="brand-title">DIAPASON</p>
+        </div>
+      </a>
+      <div class="search-bar login-search-bar">
+        <input id="search-input" type="search" placeholder="#tag, #tag, #tag, etc..." />
+        <button type="button">🔍</button>
+      </div>
+      <div class="topbar-actions">
+        <button id="header-signin-btn" class="btn btn-secondary">Se connecter</button>
+        <button id="header-signup-btn" class="btn">S'inscrire</button>
+      </div>
+    </header>
+
+    <main class="login-grid">
+      <section class="login-hero">
+        <div class="card login-hero-card">
+          <div class="card-body login-hero-body">
+            <h1 class="login-title">Diapason</h1>
+            <div class="login-logo-box">logo</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="login-panel">
+        <div class="card login-form-card">
+          <div class="card-body auth-panel">
+            <div class="auth-switch">
+              <button id="auth-tab-login" class="active">Se connecter</button>
+              <button id="auth-tab-register">S'inscrire</button>
+            </div>
+
+            <div class="login-intro login-intro-compact">
+              <h2 class="panel-title">Sign in</h2>
+              <p class="text-muted">Email ou n°</p>
+            </div>
+
+            <div id="login-panel">
+              <form id="login-form">
+                <div class="form-group">
+                  <label for="login-email">Email ou n°</label>
+                  <input id="login-email" type="email" placeholder="Email ou n°" required />
+                </div>
+                <div class="form-group">
+                  <label for="login-password">Mot de passe</label>
+                  <input id="login-password" type="password" placeholder="Mot de passe" required />
+                </div>
+                <div class="form-actions login-form-actions">
+                  <button type="submit" class="btn btn-full">Sign in</button>
+                </div>
+              </form>
+            </div>
+
+            <div id="register-panel" class="hidden">
+              <form id="register-form">
+                <div class="form-group">
+                  <label for="register-email">Email ou n°</label>
+                  <input id="register-email" type="email" placeholder="Email ou n°" required />
+                </div>
+                <div class="form-group">
+                  <label for="register-pseudo">Pseudo</label>
+                  <input id="register-pseudo" type="text" placeholder="Pseudo" required />
+                </div>
+                <div class="form-group">
+                  <label for="register-name">Nom</label>
+                  <input id="register-name" type="text" placeholder="Nom" required />
+                </div>
+                <div class="form-group">
+                  <label for="register-password">Mot de passe</label>
+                  <input id="register-password" type="password" placeholder="Mot de passe" required />
+                </div>
+                <div class="form-group">
+                  <label for="register-password-confirm">Confirmer mot de passe</label>
+                  <input id="register-password-confirm" type="password" placeholder="Confirmer mot de passe" required />
+                </div>
+                <div class="form-actions login-form-actions">
+                  <button type="submit" class="btn btn-full">Register</button>
+                </div>
+              </form>
+            </div>
+
+            <div id="auth-message" class="notification hidden"></div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="/js/login.js" defer></script>
+</body>
+</html>

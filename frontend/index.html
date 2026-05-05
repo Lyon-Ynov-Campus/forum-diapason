@@ -1,11 +1,135 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Forum Diapason</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Diapason Forum</title>
+  <link rel="stylesheet" href="/css/style.css" />
 </head>
 <body>
-    <h1>Forum Diapason</h1>
+  <div class="page">
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-logo">D</div>
+        <div>
+          <p class="brand-title">DIAPASON</p>
+          <p class="text-muted">Forum des passionnés de musique</p>
+        </div>
+      </div>
+
+      <div class="search-bar">
+        <input id="search-input" type="search" placeholder="Rechercher un tag, un titre ou un mot-clé" />
+        <button type="button">Rechercher</button>
+      </div>
+
+      <div class="topbar-actions">
+        <a href="/login.html" class="btn btn-secondary">Se connecter</a>
+        <a href="/login.html?tab=register" class="btn">S'inscrire</a>
+        <button id="sign-out-button" class="btn hidden">Déconnexion</button>
+      </div>
+    </header>
+
+    <div class="grid">
+      <section>
+        <div class="card">
+          <div class="card-header">
+            <p class="section-title">Créer un post</p>
+            <h2 class="panel-title">Partage ton expérience</h2>
+          </div>
+          <div class="card-body auth-panel" id="auth-container">
+            <div class="auth-switch">
+              <button id="auth-tab-login" class="active">Connexion</button>
+              <button id="auth-tab-register">Inscription</button>
+            </div>
+
+            <div id="login-panel">
+              <form id="login-form">
+                <div class="form-group">
+                  <label for="login-email">Email</label>
+                  <input id="login-email" type="email" placeholder="Email ou pseudo" required />
+                </div>
+                <div class="form-group">
+                  <label for="login-password">Mot de passe</label>
+                  <input id="login-password" type="password" placeholder="Mot de passe" required />
+                </div>
+                <div class="form-actions">
+                  <button type="submit" class="btn">Se connecter</button>
+                </div>
+              </form>
+            </div>
+
+            <div id="register-panel" class="hidden">
+              <form id="register-form">
+                <div class="form-group">
+                  <label for="register-email">Email</label>
+                  <input id="register-email" type="email" placeholder="Email" required />
+                </div>
+                <div class="form-group">
+                  <label for="register-pseudo">Pseudo</label>
+                  <input id="register-pseudo" type="text" placeholder="Pseudo" required />
+                </div>
+                <div class="form-group">
+                  <label for="register-password">Mot de passe</label>
+                  <input id="register-password" type="password" placeholder="Mot de passe" required />
+                </div>
+                <div class="form-actions">
+                  <button type="submit" class="btn">S'inscrire</button>
+                </div>
+              </form>
+            </div>
+
+            <div id="auth-message" class="notification hidden"></div>
+          </div>
+
+          <div class="card-body hidden" id="create-post-panel">
+            <div class="panel-title" id="auth-panel-title">Créer une publication</div>
+            <p class="text-muted" id="auth-panel-subtitle">Publie une question, une astuce ou une découverte musicale.</p>
+            <p class="notification" id="welcome-message"></p>
+            <form id="create-post-form">
+              <div class="form-group">
+                <label for="post-title">Titre</label>
+                <input id="post-title" type="text" placeholder="Titre de la publication" required />
+              </div>
+              <div class="form-group">
+                <label for="post-content">Description</label>
+                <textarea id="post-content" placeholder="Détaille ton post..." required></textarea>
+              </div>
+              <div class="form-group">
+                <label for="post-tags">Tags (séparés par des virgules)</label>
+                <input id="post-tags" type="text" placeholder="#tag1, #tag2" />
+              </div>
+              <div class="form-actions">
+                <button type="submit" class="btn">Publier</button>
+                <button type="reset" class="btn btn-secondary">Annuler</button>
+              </div>
+            </form>
+            <div id="create-post-message" class="notification hidden"></div>
+          </div>
+        </div>
+      </section>
+
+      <main>
+        <div class="card">
+          <div class="card-header">
+            <p class="section-title">Fil d'actualité</p>
+            <h2 class="panel-title">Derniers posts</h2>
+          </div>
+          <div class="card-body card-list" id="post-feed"></div>
+        </div>
+      </main>
+
+      <aside>
+        <div class="card">
+          <div class="card-header">
+            <p class="section-title">Top post</p>
+            <h2 class="panel-title">Les publications populaires</h2>
+          </div>
+          <div class="card-body" id="top-posts"></div>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <script src="/js/main.js" defer></script>
 </body>
 </html>
