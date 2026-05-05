@@ -11,7 +11,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-// Register 
+// Register
 
 func Register(db *sql.DB, nom, pseudo, email, password string) (*models.User, error) {
 	// Validations
@@ -61,7 +61,7 @@ func Register(db *sql.DB, nom, pseudo, email, password string) (*models.User, er
 	}, nil
 }
 
-// Login 
+// Login
 
 func Login(db *sql.DB, emailOrPseudo, password string) (*models.User, error) {
 	user := &models.User{}
@@ -89,7 +89,7 @@ func Login(db *sql.DB, emailOrPseudo, password string) (*models.User, error) {
 	return user, nil
 }
 
-// CreateSession 
+// CreateSession
 
 func CreateSession(db *sql.DB, w http.ResponseWriter, userID int) error {
 	sessionID, err := utils.GenerateSessionID()
@@ -111,7 +111,7 @@ func CreateSession(db *sql.DB, w http.ResponseWriter, userID int) error {
 	return nil
 }
 
-// Logout 
+// Logout
 
 func Logout(db *sql.DB, w http.ResponseWriter, r *http.Request) {
 	cookie, err := r.Cookie(utils.SessionCookieName)
@@ -121,13 +121,7 @@ func Logout(db *sql.DB, w http.ResponseWriter, r *http.Request) {
 	utils.ClearSessionCookie(w)
 }
 
-// DeleteExpiredSessions 
-
-func DeleteExpiredSessions(db *sql.DB) {
-	db.Exec(`DELETE FROM sessions WHERE expires_at <= datetime('now')`)
-}
-// À appeler périodiquement (ex: goroutine au démarrage)
-
+// DeleteExpiredSessions à appeler périodiquement (ex: goroutine au démarrage)
 func DeleteExpiredSessions(db *sql.DB) {
 	db.Exec(`DELETE FROM sessions WHERE expires_at <= datetime('now')`)
 }

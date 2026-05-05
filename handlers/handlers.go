@@ -3,6 +3,7 @@ package handlers
 // CRUD des posts, likes, commentaires, tags, follows
 
 import (
+	"database/sql"
 	"encoding/json"
 	"forum-diapason/services"
 	"forum-diapason/utils"
@@ -10,6 +11,13 @@ import (
 	"strconv"
 	"strings"
 )
+
+var db *sql.DB
+
+// Init initialise le package handlers avec la base de données
+func Init(database *sql.DB) {
+	db = database
+}
 
 // POSTS
 
@@ -348,3 +356,18 @@ func parseID(path, prefix string) (int, error) {
 		s = s[:idx]
 	}
 	return strconv.Atoi(s)
+}
+
+// sendError envoie une réponse d'erreur JSON
+func sendError(w http.ResponseWriter, statusCode int, message string) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(statusCode)
+	json.NewEncoder(w).Encode(map[string]string{"error": message})
+}
+
+// sendJSON envoie une réponse JSON
+func sendJSON(w http.ResponseWriter, statusCode int, data interface{}) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(statusCode)
+	json.NewEncoder(w).Encode(data)
+}
