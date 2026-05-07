@@ -123,6 +123,5 @@ func Me(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		sendJSON(w, http.StatusOK, map[string]string{"message": "compte supprimé"})
-
-	sendJSON(w, http.StatusOK, user)
+	}
 }

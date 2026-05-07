@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strings"
 	"time"
 
 	"forum-diapason/database"
@@ -64,6 +65,7 @@ func main() {
 	})
 	http.Handle("/css/", http.FileServer(http.Dir("./frontend/")))
 	http.Handle("/js/",  http.FileServer(http.Dir("./frontend/")))
+	http.Handle("/data/", http.FileServer(http.Dir("./frontend/")))
 
 	// ── Auth ─────────────────────────────────────────────────
 	http.HandleFunc("/api/auth/register", handlers.Register)
