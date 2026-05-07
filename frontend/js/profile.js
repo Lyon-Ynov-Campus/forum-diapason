@@ -28,14 +28,19 @@ function createPostCard(post) {
     return card
 }
 
-const profileId = parseInt(new URLSearchParams(window.location.search).get('id')) || 1
+const params    = new URLSearchParams(window.location.search)
+const profileId = parseInt(params.get('id')) || null
+const profilePseudo = params.get('pseudo') || null
 
 Promise.all([
     fetch('/data/profile.json').then(r => r.json()),
     fetch('/data/posts.json').then(r => r.json())
 ]).then(([profileData, posts]) => {
     const profiles = Array.isArray(profileData) ? profileData : [profileData]
-    const profile = profiles.find(p => p.id === profileId) || profiles[0]
+    const profile = profiles.find(p =>
+        (profileId && p.id === profileId) ||
+        (profilePseudo && p.pseudo === profilePseudo)
+    ) || profiles[0]
     if (!profile) return
 
     document.getElementById('profile-pseudo').textContent = profile.pseudo

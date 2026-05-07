@@ -30,7 +30,9 @@ function createPostCard(post) {
 
 function createTopPostCard(post) {
     const card = document.getElementById('top-post-card').content.cloneNode(true)
-    card.querySelector('.top-post-author').textContent = post.author
+    const a = card.querySelector('.top-post-author')
+    a.textContent = post.author
+    a.href = `/profile?id=${post.author_id}`
     card.querySelector('.top-post-content').textContent = post.content
     card.querySelector('.top-post-date').textContent = timeAgo(post.created_at)
     return card
