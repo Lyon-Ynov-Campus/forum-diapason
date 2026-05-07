@@ -9,7 +9,9 @@ function timeAgo(dateStr) {
 
 function createPostCard(post) {
     const card = document.getElementById('post-card').content.cloneNode(true)
-    card.querySelector('.post-author').textContent = post.author
+    const authorEl = card.querySelector('.post-author')
+    authorEl.textContent = post.author
+    authorEl.href = `/profile?id=${post.author_id}`
     card.querySelector('.post-title').textContent = post.title
     card.querySelector('.post-content').textContent = post.content
     card.querySelector('.post-date').textContent = timeAgo(post.created_at)

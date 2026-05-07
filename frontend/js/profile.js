@@ -9,7 +9,9 @@ function timeAgo(dateStr) {
 
 function createPostCard(post) {
     const card = document.getElementById('post-card').content.cloneNode(true)
-    card.querySelector('.post-author').textContent = post.author
+    const authorEl = card.querySelector('.post-author')
+    authorEl.textContent = post.author
+    authorEl.href = `/profile?id=${post.author_id}`
     card.querySelector('.post-title').textContent = post.title
     card.querySelector('.post-content').textContent = post.content
     card.querySelector('.post-date').textContent = timeAgo(post.created_at)
@@ -26,16 +28,23 @@ function createPostCard(post) {
     return card
 }
 
+const profileId = parseInt(new URLSearchParams(window.location.search).get('id')) || 1
+
 Promise.all([
     fetch('/data/profile.json').then(r => r.json()),
     fetch('/data/posts.json').then(r => r.json())
-]).then(([profile, posts]) => {
+]).then(([profileData, posts]) => {
+    // Compatibilité ancien format objet / nouveau format tableau
+    const profiles = Array.isArray(profileData) ? profileData : [profileData]
+    const profile = profiles.find(p => p.id === profileId) || profiles[0]
+    if (!profile) return
+
     document.getElementById('profile-pseudo').textContent = profile.pseudo
     document.querySelector('#profile-ville span:last-child').textContent = profile.ville
     document.getElementById('profile-followers').textContent = profile.followers
     document.getElementById('profile-posts').textContent = profile.posts
 
-    const userPosts = posts.filter(p => p.author === profile.pseudo)
+    const userPosts = posts.filter(p => p.author_id === profile.id)
     const container = document.getElementById('profile-posts-container')
     userPosts.forEach(post => container.appendChild(createPostCard(post)))
 

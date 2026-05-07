@@ -1,10 +1,62 @@
-{
-    "id": 1,
-    "pseudo": "jazzlover",
-    "email": "jazz@diapason.fr",
-    "bio": "Passionné de jazz et de musique improvisée. Miles Davis forever.",
-    "ville": "Lyon",
-    "photo": "",
-    "followers": 248,
-    "posts": 1
-}
+[
+    {
+        "id": 1,
+        "pseudo": "jazzlover",
+        "email": "jazz@diapason.fr",
+        "bio": "Passionné de jazz et de musique improvisée. Miles Davis forever.",
+        "ville": "Lyon",
+        "photo": "",
+        "followers": 248,
+        "posts": 1
+    },
+    {
+        "id": 2,
+        "pseudo": "beatmaker92",
+        "email": "beat@diapason.fr",
+        "bio": "Producteur hip-hop et électro. Ableton ou rien.",
+        "ville": "Paris",
+        "photo": "",
+        "followers": 134,
+        "posts": 1
+    },
+    {
+        "id": 3,
+        "pseudo": "guitariste_du_dimanche",
+        "email": "guitar@diapason.fr",
+        "bio": "Guitariste amateur, fan de Pink Floyd et de blues.",
+        "ville": "Bordeaux",
+        "photo": "",
+        "followers": 89,
+        "posts": 1
+    },
+    {
+        "id": 4,
+        "pseudo": "vinylhunter",
+        "email": "vinyl@diapason.fr",
+        "bio": "Chasseur de vinyles rares. Coltrane, Davis, Monk.",
+        "ville": "Lyon",
+        "photo": "",
+        "followers": 412,
+        "posts": 1
+    },
+    {
+        "id": 5,
+        "pseudo": "synth_addict",
+        "email": "synth@diapason.fr",
+        "bio": "Accro aux synthétiseurs analogiques. Moog, Korg, Roland.",
+        "ville": "Toulouse",
+        "photo": "",
+        "followers": 201,
+        "posts": 1
+    },
+    {
+        "id": 6,
+        "pseudo": "classique_forever",
+        "email": "classique@diapason.fr",
+        "bio": "Mélomane classique. Beethoven, Bach, Chopin.",
+        "ville": "Strasbourg",
+        "photo": "",
+        "followers": 76,
+        "posts": 1
+    }
+]
