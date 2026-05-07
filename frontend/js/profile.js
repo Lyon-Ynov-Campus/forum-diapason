@@ -30,4 +30,9 @@ Promise.all([
     const userPosts = posts.filter(p => p.author === profile.pseudo)
     const container = document.getElementById('profile-posts-container')
     userPosts.forEach(post => container.appendChild(createPostCard(post)))
+
+    // Bouton edit → ouvre le modal pré-rempli
+    document.getElementById('open-edit-profile-btn')?.addEventListener('click', () => {
+        openEditProfileModal(profile)
+    })
 })
