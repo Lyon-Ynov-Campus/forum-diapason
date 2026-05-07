@@ -21,10 +21,10 @@ function createPostCard(post) {
     const article = card.querySelector('article')
     article.style.cursor = 'pointer'
     article.addEventListener('click', (e) => {
-        if (e.target.closest('button')) return 
+        if (e.target.closest('button')) return
         window.location.href = `/post?id=${post.id}`
     })
-
+    initPostCard(article, post)
     return card
 }
 

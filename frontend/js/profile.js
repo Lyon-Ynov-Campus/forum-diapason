@@ -24,7 +24,7 @@ function createPostCard(post) {
         if (e.target.closest('button')) return
         window.location.href = `/post?id=${post.id}`
     })
-
+    initPostCard(article, post)
     return card
 }
 
@@ -34,7 +34,6 @@ Promise.all([
     fetch('/data/profile.json').then(r => r.json()),
     fetch('/data/posts.json').then(r => r.json())
 ]).then(([profileData, posts]) => {
-    // Compatibilité ancien format objet / nouveau format tableau
     const profiles = Array.isArray(profileData) ? profileData : [profileData]
     const profile = profiles.find(p => p.id === profileId) || profiles[0]
     if (!profile) return

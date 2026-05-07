@@ -1,4 +1,46 @@
 
+function showToast(msg) {
+    const t = document.createElement('div')
+    t.textContent = msg
+    t.className = 'fixed bottom-6 left-1/2 -translate-x-1/2 bg-black text-white text-xs px-4 py-2 rounded shadow z-50'
+    document.body.appendChild(t)
+    setTimeout(() => t.remove(), 2000)
+}
+
+
+function initPostCard(card, post) {
+    let liked = false
+    let count = post.likes
+
+    const likeBtn    = card.querySelector('.post-like-btn')
+    const heart      = card.querySelector('.post-heart')
+    const likesEl    = card.querySelector('.post-likes')
+    const shareBtn   = card.querySelector('.post-share-btn')
+    const commentBtn = card.querySelector('.post-comment-btn')
+
+    likeBtn?.addEventListener('click', (e) => {
+        e.stopPropagation()
+        liked = !liked
+        count += liked ? 1 : -1
+        likesEl.textContent = count
+        heart.setAttribute('fill', liked ? '#ef4444' : 'none')
+        heart.setAttribute('stroke', liked ? '#ef4444' : 'currentColor')
+        likeBtn.classList.toggle('text-red-500', liked)
+    })
+
+    shareBtn?.addEventListener('click', (e) => {
+        e.stopPropagation()
+        navigator.clipboard.writeText(`${location.origin}/post?id=${post.id}`)
+            .then(() => showToast('Lien copié !'))
+    })
+
+    commentBtn?.addEventListener('click', (e) => {
+        e.stopPropagation()
+        window.location.href = `/post?id=${post.id}`
+    })
+}
+
+// --- Menu burger ---
 function initMenuBurger() {
     const menu = document.getElementById('menu-burger')
     const btn = document.querySelector('[data-burger]')
@@ -170,10 +212,41 @@ function applyLight() {
     document.getElementById('theme-dot')?.classList.remove('translate-x-5')
 }
 
+
+function initAuthForms() {
+    document.querySelectorAll('input[type=password]').forEach(input => {
+        const btn = document.createElement('button')
+        btn.type = 'button'
+        btn.textContent = '👁'
+        btn.className = 'absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm'
+        input.parentElement.style.position = 'relative'
+        input.style.paddingRight = '2rem'
+        input.parentElement.appendChild(btn)
+        btn.addEventListener('click', () => {
+            input.type = input.type === 'password' ? 'text' : 'password'
+        })
+    })
+
+    // Validation register : mots de passe identiques
+    const pw  = document.querySelector('input[name=password]')
+    const pw2 = document.querySelector('input[name=password_confirm]')
+    const submitBtn = document.querySelector('form button[type=submit]')
+    if (pw && pw2 && submitBtn) {
+        const check = () => {
+            const mismatch = pw2.value && pw.value !== pw2.value
+            pw2.style.borderColor = mismatch ? '#ef4444' : ''
+            submitBtn.disabled = !!mismatch
+        }
+        pw.addEventListener('input', check)
+        pw2.addEventListener('input', check)
+    }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     initTheme()
     initMenuBurger()
     initEditProfileModal()
     initContactsModal()
     initFilterModal()
+    initAuthForms()
 })
