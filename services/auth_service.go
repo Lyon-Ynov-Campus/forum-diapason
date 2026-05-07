@@ -11,10 +11,8 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-// Register 
-
+// Register crée un nouvel utilisateur après validation
 func Register(db *sql.DB, nom, pseudo, email, password string) (*models.User, error) {
-	// Validations
 	if !utils.IsValidEmail(email) {
 		return nil, errors.New("email invalide")
 	}
@@ -25,7 +23,6 @@ func Register(db *sql.DB, nom, pseudo, email, password string) (*models.User, er
 		return nil, errors.New("pseudo invalide (3-30 caractères)")
 	}
 
-	// Vérifier unicité email + pseudo
 	var exists int
 	db.QueryRow(`SELECT COUNT(*) FROM users WHERE email = ?`, email).Scan(&exists)
 	if exists > 0 {
@@ -36,13 +33,11 @@ func Register(db *sql.DB, nom, pseudo, email, password string) (*models.User, er
 		return nil, errors.New("pseudo déjà utilisé")
 	}
 
-	// Hasher le mot de passe
 	hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
 		return nil, errors.New("erreur lors du hashage")
 	}
 
-	// Insérer l'utilisateur
 	result, err := db.Exec(
 		`INSERT INTO users (nom, pseudo, email, password) VALUES (?, ?, ?, ?)`,
 		nom, pseudo, email, string(hash),
@@ -61,8 +56,7 @@ func Register(db *sql.DB, nom, pseudo, email, password string) (*models.User, er
 	}, nil
 }
 
-// Login 
-
+// Login vérifie les identifiants et retourne l'utilisateur
 func Login(db *sql.DB, emailOrPseudo, password string) (*models.User, error) {
 	user := &models.User{}
 
@@ -85,12 +79,11 @@ func Login(db *sql.DB, emailOrPseudo, password string) (*models.User, error) {
 		return nil, errors.New("identifiants incorrects")
 	}
 
-	user.Password = "" // ne jamais renvoyer le hash
+	user.Password = ""
 	return user, nil
 }
 
-// CreateSession 
-
+// CreateSession crée une session en base et pose le cookie
 func CreateSession(db *sql.DB, w http.ResponseWriter, userID int) error {
 	sessionID, err := utils.GenerateSessionID()
 	if err != nil {
@@ -111,8 +104,7 @@ func CreateSession(db *sql.DB, w http.ResponseWriter, userID int) error {
 	return nil
 }
 
-// Logout 
-
+// Logout supprime la session en base et efface le cookie
 func Logout(db *sql.DB, w http.ResponseWriter, r *http.Request) {
 	cookie, err := r.Cookie(utils.SessionCookieName)
 	if err == nil {
@@ -121,13 +113,7 @@ func Logout(db *sql.DB, w http.ResponseWriter, r *http.Request) {
 	utils.ClearSessionCookie(w)
 }
 
-// DeleteExpiredSessions 
-
-func DeleteExpiredSessions(db *sql.DB) {
-	db.Exec(`DELETE FROM sessions WHERE expires_at <= datetime('now')`)
-}
-// À appeler périodiquement (ex: goroutine au démarrage)
-
+// DeleteExpiredSessions nettoie les sessions expirées — à appeler périodiquement
 func DeleteExpiredSessions(db *sql.DB) {
 	db.Exec(`DELETE FROM sessions WHERE expires_at <= datetime('now')`)
 }
