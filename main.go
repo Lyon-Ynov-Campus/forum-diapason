@@ -1,20 +1,15 @@
 package main
 
 import (
-	"html/template"
 	"log"
 	"net/http"
 	"os"
+	"time"
 
 	"forum-diapason/database"
 	"forum-diapason/handlers"
+	"forum-diapason/services"
 )
-
-// page charge une page et tous les composants réutilisables
-func page(name string) *template.Template {
-	t := template.Must(template.ParseGlob("./frontend/components/*.html"))
-	return template.Must(t.ParseFiles("./frontend/pages/"+name+".html"))
-}
 
 func getEnv(key, fallback string) string {
 	if v := os.Getenv(key); v != "" {
@@ -32,30 +27,32 @@ func main() {
 
 	handlers.Init(db)
 
+	// Sinon la table sessions grossit indéfiniment
+	services.StartSessionCleanup(db, time.Hour)
+
 	// Pages
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path != "/" {
 			http.NotFound(w, r)
 			return
 		}
-		page("home").ExecuteTemplate(w, "home.html", nil)
+		handlers.RenderPage(w, r, "home", nil)
 	})
-	http.HandleFunc("/login", func(w http.ResponseWriter, r *http.Request) {
-		page("login").ExecuteTemplate(w, "login.html", nil)
-	})
-	http.HandleFunc("/register", func(w http.ResponseWriter, r *http.Request) {
-		page("register").ExecuteTemplate(w, "register.html", nil)
-	})
+	http.HandleFunc("/login", handlers.LoginPage)
+	http.HandleFunc("/register", handlers.RegisterPage)
+	http.HandleFunc("/logout", handlers.LogoutPage)
 	http.HandleFunc("/profile", func(w http.ResponseWriter, r *http.Request) {
-		page("profile").ExecuteTemplate(w, "profile.html", nil)
+		if handlers.RequirePageAuth(w, r) == 0 {
+			return
+		}
+		handlers.RenderPage(w, r, "profile", nil)
 	})
 	http.HandleFunc("/post", func(w http.ResponseWriter, r *http.Request) {
-		page("post").ExecuteTemplate(w, "post.html", nil)
+		handlers.RenderPage(w, r, "post", nil)
 	})
 
-	// API — à compléter
-	// http.HandleFunc("/api/auth/register", handlers.Register)
-	// http.HandleFunc("/api/posts", handlers.Posts)
+	// API
+	http.HandleFunc("/api/auth/me", handlers.Me)
 
 	// Fichiers statiques
 	http.Handle("/css/", http.FileServer(http.Dir("./frontend/")))
