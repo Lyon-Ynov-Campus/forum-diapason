@@ -2,7 +2,7 @@
 
 ## Prérequis
 
-- [Go](https://go.dev/dl/) 1.21+
+- [Go](https://go.dev/dl/) 1.25+
 - GCC (requis par go-sqlite3) — `sudo apt install gcc` sur Ubuntu
 - [Air](https://github.com/air-verse/air) — live reload
 
