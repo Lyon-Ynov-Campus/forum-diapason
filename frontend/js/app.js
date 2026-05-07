@@ -139,7 +139,39 @@ function initFilterModal() {
     })
 }
 
+// --- Dark / Light mode ---
+function initTheme() {
+    const isDark = localStorage.getItem('theme') === 'dark'
+    if (isDark) applyDark()
+
+    document.getElementById('theme-toggle')?.addEventListener('click', () => {
+        const dark = document.documentElement.classList.contains('dark')
+        dark ? applyLight() : applyDark()
+    })
+}
+
+function applyDark() {
+    document.documentElement.classList.add('dark')
+    localStorage.setItem('theme', 'dark')
+    document.getElementById('theme-label').textContent = 'LIGHT MODE'
+    document.getElementById('theme-icon-moon')?.classList.add('hidden')
+    document.getElementById('theme-icon-sun')?.classList.remove('hidden')
+    document.getElementById('theme-pill')?.classList.replace('bg-gray-200', 'bg-black')
+    document.getElementById('theme-dot')?.classList.add('translate-x-5')
+}
+
+function applyLight() {
+    document.documentElement.classList.remove('dark')
+    localStorage.setItem('theme', 'light')
+    document.getElementById('theme-label').textContent = 'DARK MODE'
+    document.getElementById('theme-icon-moon')?.classList.remove('hidden')
+    document.getElementById('theme-icon-sun')?.classList.add('hidden')
+    document.getElementById('theme-pill')?.classList.replace('bg-black', 'bg-gray-200')
+    document.getElementById('theme-dot')?.classList.remove('translate-x-5')
+}
+
 document.addEventListener('DOMContentLoaded', () => {
+    initTheme()
     initMenuBurger()
     initEditProfileModal()
     initContactsModal()
