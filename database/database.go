@@ -97,6 +97,16 @@ func runMigrations(db *sql.DB) {
 			PRIMARY KEY (follower_id, followed_id)
 		)`,
 		`CREATE INDEX IF NOT EXISTS idx_follows_followed_id ON follows(followed_id)`,
+		// OAUTH/EMAIL
+		/*
+		`CREATE TABLE IF NOT EXISTS magic_tokens (
+		token      TEXT     PRIMARY KEY,
+		email      TEXT     NOT NULL,
+		expires_at DATETIME NOT NULL,
+		used       INTEGER  NOT NULL DEFAULT 0 
+		)`,
+		`CREATE INDEX IF NOT EXISTS idx_magic_tokens_email ON magic_tokens(email)`, 
+		*/
 	}
 
 	for _, q := range queries {
@@ -105,3 +115,6 @@ func runMigrations(db *sql.DB) {
 		}
 	}
 }
+
+
+

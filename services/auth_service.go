@@ -14,7 +14,6 @@ import (
 // Register
 
 func Register(db *sql.DB, nom, pseudo, email, password string) (*models.User, error) {
-	// Validations
 	if !utils.IsValidEmail(email) {
 		return nil, errors.New("email invalide")
 	}
@@ -25,7 +24,6 @@ func Register(db *sql.DB, nom, pseudo, email, password string) (*models.User, er
 		return nil, errors.New("pseudo invalide (3-30 caractères)")
 	}
 
-	// Vérifier unicité email + pseudo
 	var exists int
 	db.QueryRow(`SELECT COUNT(*) FROM users WHERE email = ?`, email).Scan(&exists)
 	if exists > 0 {
@@ -36,13 +34,11 @@ func Register(db *sql.DB, nom, pseudo, email, password string) (*models.User, er
 		return nil, errors.New("pseudo déjà utilisé")
 	}
 
-	// Hasher le mot de passe
 	hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
 		return nil, errors.New("erreur lors du hashage")
 	}
 
-	// Insérer l'utilisateur
 	result, err := db.Exec(
 		`INSERT INTO users (nom, pseudo, email, password) VALUES (?, ?, ?, ?)`,
 		nom, pseudo, email, string(hash),
@@ -85,7 +81,7 @@ func Login(db *sql.DB, emailOrPseudo, password string) (*models.User, error) {
 		return nil, errors.New("identifiants incorrects")
 	}
 
-	user.Password = "" // ne jamais renvoyer le hash
+	user.Password = ""
 	return user, nil
 }
 
