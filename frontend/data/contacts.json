@@ -1,0 +1,7 @@
+[
+    { "id": 2, "pseudo": "vinylhunter",   "photo": "", "following": false },
+    { "id": 3, "pseudo": "beatmaker92",   "photo": "", "following": true  },
+    { "id": 4, "pseudo": "synth_addict",  "photo": "", "following": false },
+    { "id": 5, "pseudo": "guitariste_du_dimanche", "photo": "", "following": true },
+    { "id": 6, "pseudo": "classique_forever", "photo": "", "following": false }
+]
