@@ -1,5 +1,5 @@
 // JS commun à toutes les pages
-// ── Utilitaires ──────────────────────────────────────────────
+// Utilitaires 
 
 async function apiPost(url, data) {
     const res = await fetch(url, {
@@ -22,7 +22,7 @@ function showError(formEl, message) {
     el.textContent = message
 }
 
-// ── Register ─────────────────────────────────────────────────
+//Register
 
 const registerForm = document.getElementById('register-form')
 if (registerForm) {
@@ -48,7 +48,7 @@ if (registerForm) {
     })
 }
 
-// ── Login ────────────────────────────────────────────────────
+//Login
 
 const loginForm = document.getElementById('login-form')
 if (loginForm) {
@@ -68,6 +68,58 @@ if (loginForm) {
             showError(loginForm, err.message)
             btn.disabled = false
             btn.textContent = 'Sign in'
+        }
+    })
+}
+//Create Post 
+
+const createPostBtn = document.getElementById('create-post-btn')
+if (createPostBtn) {
+    const tags = []
+
+    // Gestion des tags
+    const tagInput  = document.getElementById('tag-input')
+    const tagList   = document.getElementById('tag-list')
+
+    if (tagInput) {
+        tagInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ',') {
+                e.preventDefault()
+                const val = tagInput.value.trim().replace(/^#/, '')
+                if (val && !tags.includes(val)) {
+                    tags.push(val)
+                    renderTags()
+                }
+                tagInput.value = ''
+            }
+        })
+    }
+
+    function renderTags() {
+        if (!tagList) return
+        tagList.innerHTML = tags.map((t, i) => `
+            <span class="flex items-center gap-1 border border-gray-300 px-2 py-0.5">
+                #${t}
+                <button type="button" data-i="${i}">×</button>
+            </span>`).join('')
+        tagList.querySelectorAll('button').forEach(btn => {
+            btn.addEventListener('click', () => {
+                tags.splice(+btn.dataset.i, 1)
+                renderTags()
+            })
+        })
+    }
+
+    createPostBtn.addEventListener('click', async () => {
+        const titre   = document.getElementById('post-titre')?.value.trim()
+        const contenu = document.getElementById('post-contenu')?.value.trim()
+        if (!titre || !contenu) return
+
+        try {
+            await apiPost('/api/posts', { titre, contenu, tags })
+            window.location.reload()
+        } catch (err) {
+            alert(err.message)
         }
     })
 }
