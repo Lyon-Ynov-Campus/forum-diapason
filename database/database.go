@@ -8,7 +8,7 @@ import (
 )
 
 func Init(path string) *sql.DB {
-	db, err := sql.Open("sqlite3", path)
+	db, err := sql.Open("sqlite3", path+"?_foreign_keys=on")
 	if err != nil {
 		log.Fatalf("Impossible d'ouvrir la base de données: %v", err)
 	}
@@ -22,7 +22,7 @@ func Init(path string) *sql.DB {
 func runMigrations(db *sql.DB) {
 	queries := []string{
 
-		`PRAGMA foreign_keys = ON`,
+		//`PRAGMA foreign_keys = ON`,
 
 		//USERS
 		`CREATE TABLE IF NOT EXISTS users (
