@@ -1,5 +1,3 @@
-const API = 'http://localhost:8081'
-
 function timeAgo(dateStr) {
     const diff = Math.floor((Date.now() - new Date(dateStr)) / 60000)
     if (diff < 60) return `il y a ${diff} minute${diff > 1 ? 's' : ''}`

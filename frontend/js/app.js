@@ -1,4 +1,38 @@
 
+const API = 'http://localhost:8081'
+
+// Utilisateur courant en mémoire
+let currentUser = null
+
+// --- Session ---
+async function checkAuth() {
+    try {
+        const res = await fetch(`${API}/api/auth/me`, { credentials: 'include' })
+        if (!res.ok) return
+        currentUser = await res.json()
+        updateHeaderAuth()
+    } catch (_) {}
+}
+
+function updateHeaderAuth() {
+    if (!currentUser) return
+    const signIn   = document.querySelector('a[href="/login"]')
+    const register = document.querySelector('a[href="/register"]')
+    if (signIn)   signIn.style.display   = 'none'
+    if (register) register.style.display = 'none'
+
+    // Affiche le pseudo dans la nav
+    const nav = document.querySelector('nav.flex')
+    if (nav && !document.getElementById('nav-user')) {
+        const span = document.createElement('a')
+        span.id        = 'nav-user'
+        span.href      = `/profile?id=${currentUser.id}`
+        span.textContent = currentUser.pseudo
+        span.className = 'text-sm font-bold hover:underline'
+        nav.prepend(span)
+    }
+}
+
 function initMenuBurger() {
     const menu = document.getElementById('menu-burger')
     const btn = document.querySelector('[data-burger]')
@@ -16,8 +50,8 @@ function initMenuBurger() {
     const logoutBtn = document.getElementById('menu-logout-btn')
     if (logoutBtn) {
         logoutBtn.addEventListener('click', () => {
-            document.cookie = 'session_id=; Max-Age=-1; path=/'
-            window.location.href = '/login'
+            fetch(`${API}/api/auth/logout`, { method: 'POST', credentials: 'include' })
+                .finally(() => { window.location.href = '/login' })
         })
     }
 }
@@ -176,4 +210,5 @@ document.addEventListener('DOMContentLoaded', () => {
     initEditProfileModal()
     initContactsModal()
     initFilterModal()
+    checkAuth()
 })
