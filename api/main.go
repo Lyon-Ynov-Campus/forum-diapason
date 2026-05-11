@@ -59,8 +59,9 @@ func main() {
 	mux := http.NewServeMux()
 
 	mux.HandleFunc("/api/auth/register", authRegister)
-	mux.HandleFunc("/api/auth/login", authLogin)
-	mux.HandleFunc("/api/auth/logout", authLogout)
+	mux.HandleFunc("/api/auth/login",    authLogin)
+	mux.HandleFunc("/api/auth/logout",   authLogout)
+	mux.HandleFunc("/api/auth/me",       authMe)
 
 	mux.HandleFunc("/api/posts", handlers.Posts)
 	mux.HandleFunc("/api/posts/", postsRouter)
@@ -144,4 +145,20 @@ func postsRouter(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-var _ = utils.GetUserIDFromSession
+func authMe(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		writeError(w, http.StatusMethodNotAllowed, "méthode non autorisée")
+		return
+	}
+	userID := utils.GetUserIDFromSession(r, db)
+	if userID == 0 {
+		writeError(w, http.StatusUnauthorized, "non authentifié")
+		return
+	}
+	user, err := services.GetUserByID(db, userID)
+	if err != nil {
+		writeError(w, http.StatusNotFound, err.Error())
+		return
+	}
+	writeJSON(w, http.StatusOK, user)
+}

@@ -18,6 +18,7 @@ import (
 	"strings"
 	"time"
 
+	"forum-diapason/models"
 	"forum-diapason/utils"
 
 	"golang.org/x/crypto/bcrypt"
@@ -203,4 +204,18 @@ func resizeToSquare(src image.Image, size int) image.Image {
 	out := image.NewRGBA(image.Rect(0, 0, size, size))
 	draw.CatmullRom.Scale(out, out.Bounds(), src, sr, draw.Over, nil)
 	return out
+}
+
+
+// GetUserByID retourne un utilisateur par son ID (sans le mot de passe)
+func GetUserByID(db *sql.DB, userID int) (*models.User, error) {
+	user := &models.User{}
+	err := db.QueryRow(
+		`SELECT id, nom, pseudo, email, photo_url, created_at FROM users WHERE id = ?`,
+		userID,
+	).Scan(&user.ID, &user.Nom, &user.Pseudo, &user.Email, &user.PhotoURL, &user.CreatedAt)
+	if err != nil {
+		return nil, errors.New("utilisateur introuvable")
+	}
+	return user, nil
 }
