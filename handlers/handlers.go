@@ -371,3 +371,23 @@ func sendJSON(w http.ResponseWriter, statusCode int, data interface{}) {
 	w.WriteHeader(statusCode)
 	json.NewEncoder(w).Encode(data)
 }
+
+// GET /api/posts/top?limit=6
+func TopPosts(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		sendError(w, http.StatusMethodNotAllowed, "méthode non autorisée")
+		return
+	}
+	limit := 6
+	if l := r.URL.Query().Get("limit"); l != "" {
+		if v, err := strconv.Atoi(l); err == nil && v > 0 {
+			limit = v
+		}
+	}
+	posts, err := services.GetTopPosts(db, utils.GetUserIDFromSession(r, db), limit)
+	if err != nil {
+		sendError(w, http.StatusInternalServerError, "erreur serveur")
+		return
+	}
+	sendJSON(w, http.StatusOK, posts)
+}

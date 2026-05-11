@@ -12,6 +12,8 @@ import (
 func postsRouter(w http.ResponseWriter, r *http.Request) {
 	path := r.URL.Path
 	switch {
+	case strings.HasSuffix(path, "/top"):
+		handlers.TopPosts(w, r)
 	case strings.Contains(path, "/like"):
 		handlers.LikePost(w, r)
 	case strings.Contains(path, "/comments"):

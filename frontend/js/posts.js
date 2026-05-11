@@ -43,13 +43,21 @@ function loadPosts() {
         .then(r => r.json())
         .then(posts => {
             if (!Array.isArray(posts)) return
-            const container    = document.getElementById('posts-container')
-            const topContainer = document.getElementById('top-posts-container')
+            const container = document.getElementById('posts-container')
             posts.forEach(post => container?.appendChild(createPostCard(post)))
-            ;[...posts].sort((a, b) => b.like_count - a.like_count)
-                .slice(0, 6)
-                .forEach(post => topContainer?.appendChild(createTopPostCard(post)))
         })
+
+    fetch(`${API}/api/posts/top?limit=6`)
+        .then(r => r.json())
+        .then(posts => {
+            if (!Array.isArray(posts)) {
+                console.error('top posts error:', posts)
+                return
+            }
+            const topContainer = document.getElementById('top-posts-container')
+            posts.forEach(post => topContainer?.appendChild(createTopPostCard(post)))
+        })
+        .catch(err => console.error('top posts fetch error:', err))
 }
 
 function reloadPosts() {

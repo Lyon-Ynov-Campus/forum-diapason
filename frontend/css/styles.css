@@ -251,8 +251,14 @@
   .-bottom-10 {
     bottom: calc(var(--spacing) * -10);
   }
+  .bottom-6 {
+    bottom: calc(var(--spacing) * 6);
+  }
   .left-0\.5 {
     left: calc(var(--spacing) * 0.5);
+  }
+  .left-1\/2 {
+    left: calc(1 / 2 * 100%);
   }
   .left-8 {
     left: calc(var(--spacing) * 8);
@@ -466,6 +472,10 @@
   }
   .shrink-0 {
     flex-shrink: 0;
+  }
+  .-translate-x-1\/2 {
+    --tw-translate-x: calc(calc(1 / 2 * 100%) * -1);
+    translate: var(--tw-translate-x) var(--tw-translate-y);
   }
   .translate-x-5 {
     --tw-translate-x: calc(var(--spacing) * 5);
@@ -900,6 +910,13 @@
     &:hover {
       @media (hover: hover) {
         color: var(--color-black);
+      }
+    }
+  }
+  .hover\:text-red-500 {
+    &:hover {
+      @media (hover: hover) {
+        color: var(--color-red-500);
       }
     }
   }

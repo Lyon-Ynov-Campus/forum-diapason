@@ -32,9 +32,42 @@ function createComment(comment) {
         svg?.setAttribute('stroke', liked ? '#ef4444' : 'currentColor')
     })
 
-    const replyBtn  = tpl.querySelector('.comment-reply-btn')
-    const replyForm = tpl.querySelector('.comment-reply-form')
-    replyBtn?.addEventListener('click', () => replyForm?.classList.toggle('hidden'))
+    const replyBtn    = tpl.querySelector('.comment-reply-btn')
+    const replyForm   = tpl.querySelector('.comment-reply-form')
+    const replySubmit = tpl.querySelector('.comment-reply-submit')
+    const replyInput  = replyForm?.querySelector('input')
+    const repliesEl   = tpl.querySelector('.comment-replies')
+
+    replyBtn?.addEventListener('click', () => {
+        replyForm?.classList.toggle('hidden')
+        if (replyInput && !replyForm?.classList.contains('hidden')) {
+            replyInput.value = `@${comment.author_pseudo} `
+            replyInput.focus()
+        }
+    })
+
+    replySubmit?.addEventListener('click', () => {
+        const val = replyInput?.value.trim()
+        if (!val) return
+        fetch(`${API}/api/posts/${postId}/comments`, {
+            method: 'POST',
+            credentials: 'include',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ contenu: val })
+        })
+        .then(r => r.json())
+        .then(reply => {
+            const card = document.getElementById('reply-card').content.cloneNode(true)
+            const a = card.querySelector('.reply-author')
+            a.textContent = reply.author_pseudo
+            a.href = `/profile?pseudo=${encodeURIComponent(reply.author_pseudo)}`
+            card.querySelector('.reply-content').textContent = reply.contenu
+            card.querySelector('.reply-date').textContent = timeAgo(reply.date)
+            repliesEl.appendChild(card)
+            replyInput.value = ''
+            replyForm.classList.add('hidden')
+        })
+    })
 
     return tpl
 }
