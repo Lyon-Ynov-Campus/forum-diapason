@@ -78,7 +78,7 @@ func ProfileEditPage(w http.ResponseWriter, r *http.Request) {
 		RenderPage(w, r, "profile-edit", form)
 		return
 	}
-	http.Redirect(w, r, "/profile", http.StatusSeeOther)
+	http.Redirect(w, r, fmt.Sprintf("/profile?id=%d", user.ID), http.StatusSeeOther)
 }
 
 // POST /profile/avatar  → upload d'une nouvelle photo de profil (multipart)
@@ -112,7 +112,7 @@ func ProfileAvatarPage(w http.ResponseWriter, r *http.Request) {
 		rerenderAvatarErr(w, r, user, err.Error())
 		return
 	}
-	http.Redirect(w, r, "/profile", http.StatusSeeOther)
+	http.Redirect(w, r, fmt.Sprintf("/profile?id=%d", user.ID), http.StatusSeeOther)
 }
 
 // POST /profile/avatar/delete  → supprime la photo de profil (fichier + DB)
@@ -131,7 +131,7 @@ func ProfileAvatarDeletePage(w http.ResponseWriter, r *http.Request) {
 		rerenderAvatarErr(w, r, user, err.Error())
 		return
 	}
-	http.Redirect(w, r, "/profile", http.StatusSeeOther)
+	http.Redirect(w, r, fmt.Sprintf("/profile?id=%d", user.ID), http.StatusSeeOther)
 }
 
 // POST /profile/password  → change le mdp (ancien + nouveau + confirmation)
@@ -167,7 +167,7 @@ func ProfilePasswordPage(w http.ResponseWriter, r *http.Request) {
 		rerender(err.Error())
 		return
 	}
-	http.Redirect(w, r, "/profile", http.StatusSeeOther)
+	http.Redirect(w, r, fmt.Sprintf("/profile?id=%d", user.ID), http.StatusSeeOther)
 }
 
 // rerenderAvatarErr : helper pour rerender /profile/edit avec une erreur cote
