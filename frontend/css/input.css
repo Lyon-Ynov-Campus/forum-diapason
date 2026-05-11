@@ -1,1 +1,27 @@
 @import "tailwindcss";
+
+/* Dark mode déclenché par la classe .dark sur <html> */
+@custom-variant dark (&:is(.dark *));
+
+/* ── Overrides dark mode globaux ── */
+.dark body          { background-color: #111; color: #e5e5e5; }
+.dark header        { background-color: #1a1a1a; border-color: #333; }
+.dark footer        { background-color: #1a1a1a; border-color: #333; }
+.dark input,
+.dark textarea      { background-color: #222; color: #e5e5e5; border-color: #444; }
+.dark input::placeholder,
+.dark textarea::placeholder { color: #666; }
+.dark article       { background-color: #1a1a1a; border-color: #333; }
+.dark aside         { background-color: #1a1a1a; border-color: #333; }
+.dark #menu-burger  { background-color: #1a1a1a; border-color: #333; }
+.dark [id^="modal-"] > div { background-color: #1a1a1a; }
+.dark .divide-gray-100 > * { border-color: #333; }
+.dark .border-gray-200 { border-color: #333; }
+.dark .border-gray-300 { border-color: #444; }
+.dark .bg-gray-100  { background-color: #222; }
+.dark .bg-gray-200  { background-color: #333; }
+.dark .text-gray-400 { color: #888; }
+.dark .text-gray-500 { color: #999; }
+.dark .text-gray-700 { color: #ccc; }
+.dark .hover\:bg-gray-50:hover { background-color: #222; }
+.dark .hover\:bg-gray-800:hover { background-color: #2a2a2a; }
