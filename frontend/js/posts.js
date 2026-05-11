@@ -9,12 +9,22 @@ function timeAgo(dateStr) {
 
 function createPostCard(post) {
     const card = document.getElementById('post-card').content.cloneNode(true)
-    card.querySelector('.post-author').textContent = post.author
+    const authorEl = card.querySelector('.post-author')
+    authorEl.textContent = post.author
+    authorEl.href = `/profile?id=${post.author_id}`
     card.querySelector('.post-title').textContent = post.title
     card.querySelector('.post-content').textContent = post.content
     card.querySelector('.post-date').textContent = timeAgo(post.created_at)
     card.querySelector('.post-tags').textContent = (post.tags || []).map(t => `#${t}`).join(' ')
     card.querySelector('.post-likes').textContent = post.likes
+
+    const article = card.querySelector('article')
+    article.style.cursor = 'pointer'
+    article.addEventListener('click', (e) => {
+        if (e.target.closest('button')) return 
+        window.location.href = `/post?id=${post.id}`
+    })
+
     return card
 }
 

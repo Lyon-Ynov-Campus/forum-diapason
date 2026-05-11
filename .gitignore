@@ -15,7 +15,6 @@ vendor/
 
 # Tailwind
 tailwindcss
-frontend/css/styles.css
 tmp/
 
 # Uploads utilisateurs
