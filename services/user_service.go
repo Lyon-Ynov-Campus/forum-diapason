@@ -206,8 +206,6 @@ func resizeToSquare(src image.Image, size int) image.Image {
 	return out
 }
 
-
-// GetUserByID retourne un utilisateur par son ID (sans le mot de passe)
 func GetUserByID(db *sql.DB, userID int) (*models.User, error) {
 	user := &models.User{}
 	err := db.QueryRow(
@@ -221,6 +219,7 @@ func GetUserByID(db *sql.DB, userID int) (*models.User, error) {
 }
 
 const PostImageDir = "./public/posts"
+const PostImageMaxWidth = 800 // px
 
 // UploadPostImage enregistre une image pour un post et met à jour image_url en base
 func UploadPostImage(db *sql.DB, postID int, file multipart.File, header *multipart.FileHeader) (string, error) {
@@ -234,6 +233,16 @@ func UploadPostImage(db *sql.DB, postID int, file multipart.File, header *multip
 	img, _, err := image.Decode(file)
 	if err != nil {
 		return "", errors.New("format non supporté (jpg, png, webp)")
+	}
+
+	// Redimensionner si l'image est trop large
+	bounds := img.Bounds()
+	if bounds.Dx() > PostImageMaxWidth {
+		ratio := float64(bounds.Dy()) / float64(bounds.Dx())
+		newHeight := int(float64(PostImageMaxWidth) * ratio)
+		out := image.NewRGBA(image.Rect(0, 0, PostImageMaxWidth, newHeight))
+		draw.CatmullRom.Scale(out, out.Bounds(), img, bounds, draw.Over, nil)
+		img = out
 	}
 
 	filename := fmt.Sprintf("%d.png", postID)
