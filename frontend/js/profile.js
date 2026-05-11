@@ -1,3 +1,5 @@
+const API = 'http://localhost:8081'
+
 function timeAgo(dateStr) {
     const diff = Math.floor((Date.now() - new Date(dateStr)) / 60000)
     if (diff < 60) return `il y a ${diff} minute${diff > 1 ? 's' : ''}`
@@ -10,13 +12,13 @@ function timeAgo(dateStr) {
 function createPostCard(post) {
     const card = document.getElementById('post-card').content.cloneNode(true)
     const authorEl = card.querySelector('.post-author')
-    authorEl.textContent = post.author
-    authorEl.href = `/profile?id=${post.author_id}`
-    card.querySelector('.post-title').textContent = post.title
-    card.querySelector('.post-content').textContent = post.content
-    card.querySelector('.post-date').textContent = timeAgo(post.created_at)
+    authorEl.textContent = post.author_pseudo
+    authorEl.href = `/profile?id=${post.user_id}`
+    card.querySelector('.post-title').textContent = post.titre
+    card.querySelector('.post-content').textContent = post.contenu
+    card.querySelector('.post-date').textContent = timeAgo(post.date_publication)
     card.querySelector('.post-tags').textContent = (post.tags || []).map(t => `#${t}`).join(' ')
-    card.querySelector('.post-likes').textContent = post.likes
+    card.querySelector('.post-likes').textContent = post.like_count
 
     const article = card.querySelector('article')
     article.style.cursor = 'pointer'
@@ -24,32 +26,31 @@ function createPostCard(post) {
         if (e.target.closest('button')) return
         window.location.href = `/post?id=${post.id}`
     })
-
+    initPostCard(article, post)
     return card
 }
 
-const profileId = parseInt(new URLSearchParams(window.location.search).get('id')) || 1
+const params      = new URLSearchParams(window.location.search)
+const profileId   = parseInt(params.get('id')) || null
+const profilePseudo = params.get('pseudo') || null
 
 Promise.all([
-    fetch('/data/profile.json').then(r => r.json()),
-    fetch('/data/posts.json').then(r => r.json())
-]).then(([profileData, posts]) => {
-    // Compatibilité ancien format objet / nouveau format tableau
-    const profiles = Array.isArray(profileData) ? profileData : [profileData]
-    const profile = profiles.find(p => p.id === profileId) || profiles[0]
-    if (!profile) return
+    fetch(`${API}/api/users/${profileId || 1}`).then(r => r.json()),
+    fetch(`${API}/api/users/${profileId || 1}/posts`).then(r => r.json())
+]).then(([user, posts]) => {
+    if (!user || user.error) return
 
-    document.getElementById('profile-pseudo').textContent = profile.pseudo
-    document.querySelector('#profile-ville span:last-child').textContent = profile.ville
-    document.getElementById('profile-followers').textContent = profile.followers
-    document.getElementById('profile-posts').textContent = profile.posts
+    document.getElementById('profile-pseudo').textContent = user.pseudo
+    document.querySelector('#profile-ville span:last-child').textContent = ''
 
-    const userPosts = posts.filter(p => p.author_id === profile.id)
+    // followers/posts counts (TODO: ajouter ces champs dans l'API)
+    document.getElementById('profile-followers').textContent = '—'
+    document.getElementById('profile-posts').textContent = posts?.length ?? 0
+
     const container = document.getElementById('profile-posts-container')
-    userPosts.forEach(post => container.appendChild(createPostCard(post)))
+    ;(posts || []).forEach(post => container.appendChild(createPostCard(post)))
 
-    // Bouton edit → ouvre le modal pré-rempli
     document.getElementById('open-edit-profile-btn')?.addEventListener('click', () => {
-        openEditProfileModal(profile)
+        openEditProfileModal({ pseudo: user.pseudo })
     })
 })
