@@ -16,3 +16,7 @@ vendor/
 # Tailwind
 tailwindcss
 tmp/
+
+# Uploads utilisateurs
+public/avatars/
+

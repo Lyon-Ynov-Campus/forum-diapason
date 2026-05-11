@@ -24,17 +24,21 @@
             </div>
         </div>
 
-        <form class="flex flex-col gap-5 w-80">
+        <form method="POST" action="/login" class="flex flex-col gap-5 w-80">
+
+            {{if .Error}}
+            <p class="text-sm text-red-600 border border-red-200 bg-red-50 px-3 py-2">{{.Error}}</p>
+            {{end}}
 
             <div class="flex flex-col gap-1">
-                <label class="text-sm text-gray-700">Email ou n°</label>
-                <input type="text" placeholder="Email ou n°"
+                <label class="text-sm text-gray-700" for="email_or_pseudo">Email ou pseudo</label>
+                <input id="email_or_pseudo" name="email_or_pseudo" type="text" value="{{.EmailOrPseudo}}" placeholder="Email ou pseudo" required
                     class="border border-gray-300 px-4 py-3 text-sm outline-none focus:border-gray-500 placeholder:text-gray-400 w-full">
             </div>
 
             <div class="flex flex-col gap-1">
-                <label class="text-sm text-gray-700">Mot de passe</label>
-                <input type="password" placeholder="Mot de passe"
+                <label class="text-sm text-gray-700" for="password">Mot de passe</label>
+                <input id="password" name="password" type="password" placeholder="Mot de passe" required
                     class="border border-gray-300 px-4 py-3 text-sm outline-none focus:border-gray-500 placeholder:text-gray-400 w-full">
             </div>
 
