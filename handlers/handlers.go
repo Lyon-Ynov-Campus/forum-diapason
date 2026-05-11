@@ -391,3 +391,37 @@ func TopPosts(w http.ResponseWriter, r *http.Request) {
 	}
 	sendJSON(w, http.StatusOK, posts)
 }
+
+// POST /api/posts/{id}/image
+func UploadPostImage(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		sendError(w, http.StatusMethodNotAllowed, "méthode non autorisée")
+		return
+	}
+	userID := utils.RequireAuth(w, r, db)
+	if userID == 0 {
+		return
+	}
+	postID, err := parseID(r.URL.Path, "/api/posts/")
+	if err != nil {
+		sendError(w, http.StatusBadRequest, "ID invalide")
+		return
+	}
+	r.Body = http.MaxBytesReader(w, r.Body, services.AvatarMaxSize)
+	if err := r.ParseMultipartForm(services.AvatarMaxSize); err != nil {
+		sendError(w, http.StatusBadRequest, "image trop lourde")
+		return
+	}
+	file, header, err := r.FormFile("image")
+	if err != nil {
+		sendError(w, http.StatusBadRequest, "fichier manquant")
+		return
+	}
+	defer file.Close()
+	url, err := services.UploadPostImage(db, postID, file, header)
+	if err != nil {
+		sendError(w, http.StatusBadRequest, err.Error())
+		return
+	}
+	sendJSON(w, http.StatusOK, map[string]string{"image_url": url})
+}

@@ -114,6 +114,29 @@ func runMigrations(db *sql.DB) {
 			log.Fatalf("Migration échouée: %v", err)
 		}
 	}
+
+	// Colonnes optionnelles ajoutées après la création initiale
+	addColumnIfNotExists(db, "posts", "image_url", "TEXT NOT NULL DEFAULT ''")
+}
+
+// addColumnIfNotExists ajoute une colonne seulement si elle n'existe pas déjà
+func addColumnIfNotExists(db *sql.DB, table, column, definition string) {
+	rows, err := db.Query(`PRAGMA table_info(` + table + `)`)
+	if err != nil {
+		return
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var cid int
+		var name, colType string
+		var notNull, pk int
+		var dflt any
+		rows.Scan(&cid, &name, &colType, &notNull, &dflt, &pk)
+		if name == column {
+			return // colonne existe déjà
+		}
+	}
+	db.Exec(`ALTER TABLE ` + table + ` ADD COLUMN ` + column + ` ` + definition)
 }
 
 

@@ -219,3 +219,34 @@ func GetUserByID(db *sql.DB, userID int) (*models.User, error) {
 	}
 	return user, nil
 }
+
+const PostImageDir = "./public/posts"
+
+// UploadPostImage enregistre une image pour un post et met à jour image_url en base
+func UploadPostImage(db *sql.DB, postID int, file multipart.File, header *multipart.FileHeader) (string, error) {
+	if header.Size > AvatarMaxSize {
+		return "", fmt.Errorf("image trop lourde (max %d Mo)", AvatarMaxSize>>20)
+	}
+	if err := os.MkdirAll(PostImageDir, 0755); err != nil {
+		return "", errors.New("erreur création dossier")
+	}
+
+	img, _, err := image.Decode(file)
+	if err != nil {
+		return "", errors.New("format non supporté (jpg, png, webp)")
+	}
+
+	filename := fmt.Sprintf("%d.png", postID)
+	dest, err := os.Create(filepath.Join(PostImageDir, filename))
+	if err != nil {
+		return "", err
+	}
+	defer dest.Close()
+	if err := png.Encode(dest, img); err != nil {
+		return "", err
+	}
+
+	webPath := fmt.Sprintf("/posts/%s?v=%d", filename, time.Now().Unix())
+	_, err = db.Exec(`UPDATE posts SET image_url = ? WHERE id = ?`, webPath, postID)
+	return webPath, err
+}

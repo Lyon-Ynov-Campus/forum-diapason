@@ -99,6 +99,19 @@ function render(post) {
     document.getElementById('post-tags').textContent    = (post.tags || []).map(t => `#${t}`).join(' ')
     document.getElementById('post-likes').textContent   = post.like_count
 
+    // Afficher l'image si elle existe
+    if (post.image_url) {
+        const imageContainer = document.getElementById('post-image-container')
+        if (imageContainer) {
+            const img = document.createElement('img')
+            img.src = `http://localhost:8080${post.image_url}`
+            img.className = 'w-full h-full object-cover'
+            img.alt = post.titre
+            imageContainer.innerHTML = ''
+            imageContainer.appendChild(img)
+        }
+    }
+
     // Like + share
     const likeBtn = document.querySelector('.post-detail-like')
     const heart   = document.querySelector('.post-detail-heart')

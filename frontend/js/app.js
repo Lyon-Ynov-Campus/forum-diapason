@@ -246,14 +246,21 @@ function applyLight() {
 
 // --- Création de post ---
 function initCreatePost() {
-    const titre   = document.getElementById('cp-titre')
-    const contenu = document.getElementById('cp-contenu')
+    const titre    = document.getElementById('cp-titre')
+    const contenu  = document.getElementById('cp-contenu')
     const tagInput = document.getElementById('cp-tag-input')
-    const tagsEl  = document.getElementById('cp-tags')
-    const submit  = document.getElementById('cp-submit')
-    const cancel  = document.getElementById('cp-cancel')
-    const error   = document.getElementById('cp-error')
+    const tagsEl   = document.getElementById('cp-tags')
+    const submit   = document.getElementById('cp-submit')
+    const cancel   = document.getElementById('cp-cancel')
+    const error    = document.getElementById('cp-error')
+    const imageInput = document.getElementById('cp-image')
+    const imageLabel = document.getElementById('cp-image-label')
     if (!submit) return
+
+    imageInput?.addEventListener('change', () => {
+        const file = imageInput.files[0]
+        if (imageLabel) imageLabel.textContent = file ? file.name : 'Ajouter une image'
+    })
 
     const tags = []
 
@@ -331,9 +338,19 @@ function initCreatePost() {
                 throw new Error(data.error || 'Erreur')
             }
             // Reset et recharge les posts
+            const post = await res.json()
+            // Upload image si sélectionnée
+            if (imageInput?.files[0]) {
+                const fd = new FormData()
+                fd.append('image', imageInput.files[0])
+                await fetch(`${API}/api/posts/${post.id}/image`, {
+                    method: 'POST',
+                    credentials: 'include',
+                    body: fd
+                })
+            }
             resetForm()
             showToast('Post publié !')
-            // Recharge les posts si on est sur la home
             if (typeof reloadPosts === 'function') reloadPosts()
         } catch (err) {
             error.textContent = err.message

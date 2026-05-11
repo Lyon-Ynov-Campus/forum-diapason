@@ -60,6 +60,7 @@ func main() {
 	http.Handle("/js/", http.FileServer(http.Dir("./frontend/")))
 	http.Handle("/data/", http.FileServer(http.Dir("./frontend/")))
 	http.Handle("/avatars/", http.FileServer(http.Dir("./public/")))
+	http.Handle("/posts/", http.FileServer(http.Dir("./public/")))
 	http.Handle("/image/", http.FileServer(http.Dir("./public/")))
 
 	log.Println("Serveur lancé sur http://localhost:" + port)
