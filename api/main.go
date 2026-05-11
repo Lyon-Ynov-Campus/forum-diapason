@@ -2,54 +2,17 @@ package main
 
 import (
 	"database/sql"
-	"encoding/json"
 	"log"
 	"net/http"
-	"os"
-	"strconv"
-	"strings"
 
 	"forum-diapason/database"
 	"forum-diapason/handlers"
-	"forum-diapason/services"
-	"forum-diapason/utils"
 )
 
 var db *sql.DB
 
-func getEnv(key, fallback string) string {
-	if v := os.Getenv(key); v != "" {
-		return v
-	}
-	return fallback
-}
-
-func writeJSON(w http.ResponseWriter, status int, data any) {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(status)
-	json.NewEncoder(w).Encode(data)
-}
-
-func writeError(w http.ResponseWriter, status int, msg string) {
-	writeJSON(w, status, map[string]string{"error": msg})
-}
-
-func cors(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Access-Control-Allow-Origin", getEnv("FRONTEND_ORIGIN", "http://localhost:8080"))
-		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
-		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
-		w.Header().Set("Access-Control-Allow-Credentials", "true")
-		if r.Method == http.MethodOptions {
-			w.WriteHeader(http.StatusNoContent)
-			return
-		}
-		next.ServeHTTP(w, r)
-	})
-}
-
 func main() {
-	port := getEnv("API_PORT", "8081")
+	port   := getEnv("API_PORT", "8081")
 	dbFile := getEnv("DB_FILE", "./forum.db")
 
 	db = database.Init(dbFile)
@@ -59,203 +22,29 @@ func main() {
 
 	mux := http.NewServeMux()
 
+	// Auth
 	mux.HandleFunc("/api/auth/register", authRegister)
 	mux.HandleFunc("/api/auth/login",    authLogin)
 	mux.HandleFunc("/api/auth/logout",   authLogout)
 	mux.HandleFunc("/api/auth/me",       authMe)
 
-	mux.HandleFunc("/api/posts", handlers.Posts)
-	mux.HandleFunc("/api/posts/", postsRouter)
-
-	mux.HandleFunc("/api/comments/", handlers.DeleteComment)
-
-	mux.HandleFunc("/api/tags", handlers.Tags)
-
-	// Profil (utilisateur connecté)
+	// Profil
 	mux.HandleFunc("/api/profile",          profileUpdate)
 	mux.HandleFunc("/api/profile/password", profilePassword)
+
+	// Posts
+	mux.HandleFunc("/api/posts",  handlers.Posts)
+	mux.HandleFunc("/api/posts/", postsRouter)
+
+	// Comments
+	mux.HandleFunc("/api/comments/", handlers.DeleteComment)
+
+	// Tags
+	mux.HandleFunc("/api/tags", handlers.Tags)
 
 	// Users
 	mux.HandleFunc("/api/users/", usersRouter)
 
 	log.Println("API démarrée sur http://localhost:" + port)
 	log.Fatal(http.ListenAndServe(":"+port, cors(mux)))
-}
-
-func authRegister(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		writeError(w, http.StatusMethodNotAllowed, "méthode non autorisée")
-		return
-	}
-	var body struct {
-		Nom      string `json:"nom"`
-		Pseudo   string `json:"pseudo"`
-		Email    string `json:"email"`
-		Password string `json:"password"`
-	}
-	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
-		writeError(w, http.StatusBadRequest, "JSON invalide")
-		return
-	}
-	user, err := services.Register(db, body.Nom, body.Pseudo, body.Email, body.Password)
-	if err != nil {
-		writeError(w, http.StatusBadRequest, err.Error())
-		return
-	}
-	if err := services.CreateSession(db, w, user.ID); err != nil {
-		writeError(w, http.StatusInternalServerError, "erreur session")
-		return
-	}
-	writeJSON(w, http.StatusCreated, user)
-}
-
-func authLogin(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		writeError(w, http.StatusMethodNotAllowed, "méthode non autorisée")
-		return
-	}
-	var body struct {
-		EmailOrPseudo string `json:"email_or_pseudo"`
-		Password      string `json:"password"`
-	}
-	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
-		writeError(w, http.StatusBadRequest, "JSON invalide")
-		return
-	}
-	user, err := services.Login(db, body.EmailOrPseudo, body.Password)
-	if err != nil {
-		writeError(w, http.StatusUnauthorized, err.Error())
-		return
-	}
-	if err := services.CreateSession(db, w, user.ID); err != nil {
-		writeError(w, http.StatusInternalServerError, "erreur session")
-		return
-	}
-	writeJSON(w, http.StatusOK, user)
-}
-
-func authLogout(w http.ResponseWriter, r *http.Request) {
-	services.Logout(db, w, r)
-	writeJSON(w, http.StatusOK, map[string]string{"message": "déconnecté"})
-}
-
-func parseID(path, prefix string) int {
-	s := strings.TrimPrefix(path, prefix)
-	if i := strings.Index(s, "/"); i != -1 {
-		s = s[:i]
-	}
-	id, _ := strconv.Atoi(s)
-	return id
-}
-
-func usersRouter(w http.ResponseWriter, r *http.Request) {
-	path := r.URL.Path
-	switch {
-	case strings.HasSuffix(path, "/follow"):
-		handlers.FollowUser(w, r)
-	case strings.HasSuffix(path, "/following"):
-		handlers.GetFollowing(w, r)
-	case strings.HasSuffix(path, "/followers"):
-		handlers.GetFollowers(w, r)
-	case strings.HasSuffix(path, "/posts"):
-		userID := parseID(path, "/api/users/")
-		currentUserID := utils.GetUserIDFromSession(r, db)
-		posts, err := services.GetPostsByUser(db, userID, currentUserID, 20, 0)
-		if err != nil {
-			writeError(w, http.StatusInternalServerError, "erreur serveur")
-			return
-		}
-		writeJSON(w, http.StatusOK, posts)
-	default:
-		userID := parseID(path, "/api/users/")
-		user, err := services.GetUserByID(db, userID)
-		if err != nil {
-			writeError(w, http.StatusNotFound, err.Error())
-			return
-		}
-		writeJSON(w, http.StatusOK, user)
-	}
-}
-
-func postsRouter(w http.ResponseWriter, r *http.Request) {
-	path := r.URL.Path
-	switch {
-	case strings.Contains(path, "/like"):
-		handlers.LikePost(w, r)
-	case strings.Contains(path, "/comments"):
-		handlers.Comments(w, r)
-	case strings.Contains(path, "/tag/"):
-		handlers.PostsByTag(w, r)
-	default:
-		handlers.PostByID(w, r)
-	}
-}
-
-func profileUpdate(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPut {
-		writeError(w, http.StatusMethodNotAllowed, "méthode non autorisée")
-		return
-	}
-	userID := utils.GetUserIDFromSession(r, db)
-	if userID == 0 {
-		writeError(w, http.StatusUnauthorized, "non authentifié")
-		return
-	}
-	var body struct {
-		Nom    string `json:"nom"`
-		Pseudo string `json:"pseudo"`
-		Email  string `json:"email"`
-	}
-	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
-		writeError(w, http.StatusBadRequest, "JSON invalide")
-		return
-	}
-	if err := services.UpdateProfile(db, userID, body.Nom, body.Pseudo, body.Email); err != nil {
-		writeError(w, http.StatusBadRequest, err.Error())
-		return
-	}
-	writeJSON(w, http.StatusOK, map[string]string{"message": "profil mis à jour"})
-}
-
-func profilePassword(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPut {
-		writeError(w, http.StatusMethodNotAllowed, "méthode non autorisée")
-		return
-	}
-	userID := utils.GetUserIDFromSession(r, db)
-	if userID == 0 {
-		writeError(w, http.StatusUnauthorized, "non authentifié")
-		return
-	}
-	var body struct {
-		OldPassword string `json:"old_password"`
-		NewPassword string `json:"new_password"`
-	}
-	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
-		writeError(w, http.StatusBadRequest, "JSON invalide")
-		return
-	}
-	if err := services.UpdatePassword(db, userID, body.OldPassword, body.NewPassword); err != nil {
-		writeError(w, http.StatusBadRequest, err.Error())
-		return
-	}
-	writeJSON(w, http.StatusOK, map[string]string{"message": "mot de passe mis à jour"})
-}
-
-func authMe(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		writeError(w, http.StatusMethodNotAllowed, "méthode non autorisée")
-		return
-	}
-	userID := utils.GetUserIDFromSession(r, db)
-	if userID == 0 {
-		writeError(w, http.StatusUnauthorized, "non authentifié")
-		return
-	}
-	user, err := services.GetUserByID(db, userID)
-	if err != nil {
-		writeError(w, http.StatusNotFound, err.Error())
-		return
-	}
-	writeJSON(w, http.StatusOK, user)
 }
