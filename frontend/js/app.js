@@ -16,21 +16,10 @@ async function checkAuth() {
 
 function updateHeaderAuth() {
     if (!currentUser) return
-    const signIn   = document.querySelector('a[href="/login"]')
-    const register = document.querySelector('a[href="/register"]')
-    if (signIn)   signIn.style.display   = 'none'
-    if (register) register.style.display = 'none'
-
-    // Affiche le pseudo dans la nav
-    const nav = document.querySelector('nav.flex')
-    if (nav && !document.getElementById('nav-user')) {
-        const span = document.createElement('a')
-        span.id        = 'nav-user'
-        span.href      = `/profile?id=${currentUser.id}`
-        span.textContent = currentUser.pseudo
-        span.className = 'text-sm font-bold hover:underline'
-        nav.prepend(span)
-    }
+    // Le header est géré côté serveur (Go template .User)
+    // On affiche seulement le bouton "créer un post" si connecté
+    const createBtn = document.getElementById('createPostBtn')
+    if (createBtn) createBtn.style.display = 'inline-flex'
 }
 
 function initMenuBurger() {
