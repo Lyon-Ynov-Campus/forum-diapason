@@ -32,23 +32,24 @@ const params      = new URLSearchParams(window.location.search)
 const profileId   = parseInt(params.get('id')) || null
 const profilePseudo = params.get('pseudo') || null
 
-Promise.all([
-    fetch(`${API}/api/users/${profileId || 1}`).then(r => r.json()),
-    fetch(`${API}/api/users/${profileId || 1}/posts`).then(r => r.json())
-]).then(([user, posts]) => {
-    if (!user || user.error) return
+const userId = profileId || 1
 
-    document.getElementById('profile-pseudo').textContent = user.pseudo
-    document.querySelector('#profile-ville span:last-child').textContent = ''
-
-    // followers/posts counts (TODO: ajouter ces champs dans l'API)
-    document.getElementById('profile-followers').textContent = '—'
-    document.getElementById('profile-posts').textContent = posts?.length ?? 0
-
+fetch(`${API}/api/users/${userId}/posts`)
+    .then(r => r.json())
+    .then(posts => {
     const container = document.getElementById('profile-posts-container')
+    if (!container) return
+
+    const noPostsEl = document.getElementById('profile-no-posts')
+
+    if (!posts || posts.length === 0) return
+
+    // Cache le message "aucun post"
+    if (noPostsEl) noPostsEl.remove()
+
     ;(posts || []).forEach(post => container.appendChild(createPostCard(post)))
 
     document.getElementById('open-edit-profile-btn')?.addEventListener('click', () => {
-        openEditProfileModal({ pseudo: user.pseudo })
+        openEditProfileModal(currentUser || {})
     })
 })

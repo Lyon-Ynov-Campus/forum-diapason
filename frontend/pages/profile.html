@@ -49,13 +49,16 @@
         <hr class="border-gray-200 mx-8">
 
         <div class="py-6 max-w-2xl mx-auto px-8">
-            <h2 class="text-sm font-bold mb-4">Mes posts</h2>
-            <p class="text-sm text-gray-400">Aucun post pour l'instant.</p>
+            <h2 class="text-sm font-bold mb-4">Posts</h2>
+            <div id="profile-posts-container" class="flex flex-col gap-4">
+                <p id="profile-no-posts" class="text-sm text-gray-400">Aucun post pour l'instant.</p>
+            </div>
         </div>
 
     </main>
 
     {{template "footer" .}}
     <script src="/js/app.js"></script>
+    <script src="/js/profile.js"></script>
 </body>
 </html>
