@@ -38,17 +38,26 @@ function createTopPostCard(post) {
     return card
 }
 
-fetch(`${API}/api/posts`)
-    .then(r => r.json())
-    .then(posts => {
-        if (!Array.isArray(posts)) return
+function loadPosts() {
+    fetch(`${API}/api/posts`)
+        .then(r => r.json())
+        .then(posts => {
+            if (!Array.isArray(posts)) return
+            const container    = document.getElementById('posts-container')
+            const topContainer = document.getElementById('top-posts-container')
+            posts.forEach(post => container?.appendChild(createPostCard(post)))
+            ;[...posts].sort((a, b) => b.like_count - a.like_count)
+                .slice(0, 6)
+                .forEach(post => topContainer?.appendChild(createTopPostCard(post)))
+        })
+}
 
-        const container = document.getElementById('posts-container')
-        posts.forEach(post => container.appendChild(createPostCard(post)))
+function reloadPosts() {
+    const container    = document.getElementById('posts-container')
+    const topContainer = document.getElementById('top-posts-container')
+    if (container)    container.innerHTML    = ''
+    if (topContainer) topContainer.innerHTML = ''
+    loadPosts()
+}
 
-        const topContainer = document.getElementById('top-posts-container')
-        ;[...posts]
-            .sort((a, b) => b.like_count - a.like_count)
-            .slice(0, 6)
-            .forEach(post => topContainer.appendChild(createTopPostCard(post)))
-    })
+loadPosts()

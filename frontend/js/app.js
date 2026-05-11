@@ -1,6 +1,14 @@
 
 const API = 'http://localhost:8081'
 
+function showToast(msg) {
+    const t = document.createElement('div')
+    t.textContent = msg
+    t.className = 'fixed bottom-6 left-1/2 -translate-x-1/2 bg-black text-white text-xs px-4 py-2 rounded shadow z-50'
+    document.body.appendChild(t)
+    setTimeout(() => t.remove(), 2000)
+}
+
 // Utilisateur courant en mémoire
 let currentUser = null
 
@@ -193,11 +201,110 @@ function applyLight() {
     document.getElementById('theme-dot')?.classList.remove('translate-x-5')
 }
 
+// --- Création de post ---
+function initCreatePost() {
+    const titre   = document.getElementById('cp-titre')
+    const contenu = document.getElementById('cp-contenu')
+    const tagInput = document.getElementById('cp-tag-input')
+    const tagsEl  = document.getElementById('cp-tags')
+    const submit  = document.getElementById('cp-submit')
+    const cancel  = document.getElementById('cp-cancel')
+    const error   = document.getElementById('cp-error')
+    if (!submit) return
+
+    const tags = []
+
+    function addTag(val) {
+        val = val.trim().replace(/^#/, '').toLowerCase()
+        if (!val || tags.includes(val)) return
+        tags.push(val)
+        const pill = document.createElement('span')
+        pill.className = 'flex items-center gap-1 bg-black text-white px-2 py-0.5'
+        pill.innerHTML = `#${val} <button data-tag="${val}" class="hover:opacity-70">×</button>`
+        pill.querySelector('button').addEventListener('click', () => {
+            tags.splice(tags.indexOf(val), 1)
+            pill.remove()
+            // Re-active le preset si c'en était un
+            document.querySelector(`.cp-tag-preset[data-tag="${val}"]`)
+                ?.classList.remove('bg-black', 'text-white', 'border-black')
+        })
+        tagsEl.appendChild(pill)
+    }
+
+    // Toggle tags prédéfinis
+    document.querySelectorAll('.cp-tag-preset').forEach(preset => {
+        preset.addEventListener('click', () => {
+            const val = preset.dataset.tag
+            if (tags.includes(val)) {
+                tags.splice(tags.indexOf(val), 1)
+                tagsEl.querySelector(`button[data-tag="${val}"]`)?.parentElement.remove()
+                preset.classList.remove('bg-black', 'text-white', 'border-black')
+            } else {
+                addTag(val)
+                preset.classList.add('bg-black', 'text-white', 'border-black')
+            }
+        })
+    })
+
+    // Tag personnalisé avec Entrée
+    tagInput?.addEventListener('keydown', (e) => {
+        if (e.key !== 'Enter') return
+        e.preventDefault()
+        addTag(tagInput.value)
+        tagInput.value = ''
+    })
+
+    function resetForm() {
+        titre.value = ''
+        contenu.value = ''
+        tagInput.value = ''
+        tagsEl.innerHTML = ''
+        tags.length = 0
+        error.classList.add('hidden')
+        document.querySelectorAll('.cp-tag-preset').forEach(p =>
+            p.classList.remove('bg-black', 'text-white', 'border-black'))
+    }
+
+    cancel?.addEventListener('click', resetForm)
+
+    submit.addEventListener('click', async () => {
+        error.classList.add('hidden')
+        const t = titre.value.trim()
+        const c = contenu.value.trim()
+        if (!t || !c) {
+            error.textContent = 'Titre et description requis'
+            error.classList.remove('hidden')
+            return
+        }
+        try {
+            const res = await fetch(`${API}/api/posts`, {
+                method: 'POST',
+                credentials: 'include',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ titre: t, contenu: c, tags })
+            })
+            if (!res.ok) {
+                const data = await res.json()
+                throw new Error(data.error || 'Erreur')
+            }
+            // Reset et recharge les posts
+            resetForm()
+            showToast('Post publié !')
+            // Recharge les posts si on est sur la home
+            if (typeof reloadPosts === 'function') reloadPosts()
+        } catch (err) {
+            error.textContent = err.message
+            error.classList.remove('hidden')
+        }
+    })
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     initTheme()
     initMenuBurger()
     initEditProfileModal()
     initContactsModal()
     initFilterModal()
+    initCreatePost()
     checkAuth()
 })

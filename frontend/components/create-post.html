@@ -3,25 +3,37 @@
 
     <p class="font-bold text-xs">CREER UN POST</p>
 
-    <input type="text" placeholder="TITRE" class="border border-gray-200 px-2 py-1 outline-none w-full placeholder:text-gray-400 text-xs">
-    <textarea placeholder="DESCRIPTION" rows="3" class="border border-gray-200 px-2 py-1 outline-none w-full resize-none placeholder:text-gray-400 text-xs"></textarea>
-    <input type="text" placeholder="TAG" class="border border-gray-200 px-2 py-1 outline-none w-full placeholder:text-gray-400 text-xs">
+    <input id="cp-titre" type="text" placeholder="TITRE"
+        class="border border-gray-200 px-2 py-1 outline-none w-full placeholder:text-gray-400 text-xs">
+    <textarea id="cp-contenu" placeholder="DESCRIPTION" rows="3"
+        class="border border-gray-200 px-2 py-1 outline-none w-full resize-none placeholder:text-gray-400 text-xs"></textarea>
 
-    <div class="border border-gray-200 flex items-center justify-center h-20 cursor-pointer hover:bg-gray-50">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-        </svg>
-    </div>
-
+    <!-- Tags prédéfinis -->
     <div class="flex flex-wrap gap-1">
-        <span class="flex items-center gap-1 border border-gray-300 px-2 py-0.5">Tag <button>×</button></span>
-        <span class="flex items-center gap-1 border border-gray-300 px-2 py-0.5">Tag <button>×</button></span>
-        <span class="flex items-center gap-1 border border-gray-300 px-2 py-0.5">Tag <button>×</button></span>
+        <span class="cp-tag-preset cursor-pointer border border-gray-200 px-2 py-0.5 hover:bg-black hover:text-white hover:border-black transition-colors" data-tag="jazz">jazz</span>
+        <span class="cp-tag-preset cursor-pointer border border-gray-200 px-2 py-0.5 hover:bg-black hover:text-white hover:border-black transition-colors" data-tag="rap">rap</span>
+        <span class="cp-tag-preset cursor-pointer border border-gray-200 px-2 py-0.5 hover:bg-black hover:text-white hover:border-black transition-colors" data-tag="rock">rock</span>
+        <span class="cp-tag-preset cursor-pointer border border-gray-200 px-2 py-0.5 hover:bg-black hover:text-white hover:border-black transition-colors" data-tag="classique">classique</span>
+        <span class="cp-tag-preset cursor-pointer border border-gray-200 px-2 py-0.5 hover:bg-black hover:text-white hover:border-black transition-colors" data-tag="electro">electro</span>
+        <span class="cp-tag-preset cursor-pointer border border-gray-200 px-2 py-0.5 hover:bg-black hover:text-white hover:border-black transition-colors" data-tag="rnb">rnb</span>
+        <span class="cp-tag-preset cursor-pointer border border-gray-200 px-2 py-0.5 hover:bg-black hover:text-white hover:border-black transition-colors" data-tag="vinyle">vinyle</span>
+        <span class="cp-tag-preset cursor-pointer border border-gray-200 px-2 py-0.5 hover:bg-black hover:text-white hover:border-black transition-colors" data-tag="album">album</span>
+        <span class="cp-tag-preset cursor-pointer border border-gray-200 px-2 py-0.5 hover:bg-black hover:text-white hover:border-black transition-colors" data-tag="instrument">instrument</span>
+        <span class="cp-tag-preset cursor-pointer border border-gray-200 px-2 py-0.5 hover:bg-black hover:text-white hover:border-black transition-colors" data-tag="production">production</span>
     </div>
+
+    <!-- Tags sélectionnés -->
+    <div id="cp-tags" class="flex flex-wrap gap-1 min-h-[20px]"></div>
+
+    <!-- Tag personnalisé -->
+    <input id="cp-tag-input" type="text" placeholder="Autre tag (Entrée pour ajouter)"
+        class="border border-gray-200 px-2 py-1 outline-none w-full placeholder:text-gray-400 text-xs">
+
+    <p id="cp-error" class="text-red-500 hidden"></p>
 
     <div class="flex gap-2 mt-1">
-        <button class="flex-1 border border-gray-300 py-1 hover:bg-gray-50">CANCEL</button>
-        <button class="flex-1 bg-black text-white py-1 hover:bg-gray-800">POST</button>
+        <button id="cp-cancel" class="flex-1 border border-gray-300 py-1 hover:bg-gray-50">CANCEL</button>
+        <button id="cp-submit" class="flex-1 bg-black text-white py-1 hover:bg-gray-800">POST</button>
     </div>
 
 </aside>
