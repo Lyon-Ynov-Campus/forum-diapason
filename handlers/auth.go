@@ -1,8 +1,8 @@
 package handlers
 
-// Pages d'auth : inscription, connexion, déconnexion.
+// Pages d'auth : inscription, connexion, deco
 // Tout fonctionne en rendu HTML classique : form POST → redirect en cas de
-// succès, ou ré-affichage de la page avec un message d'erreur.
+// succes, ou re-affichage de la page avec un message d'erreur
 
 import (
 	"net/http"
@@ -10,8 +10,8 @@ import (
 	"forum-diapason/services"
 )
 
-// LoginPage gère le GET (affichage du form) et le POST (tentative de connexion).
-// Un user déjà connecté est renvoyé chez lui sans même voir le formulaire.
+// LoginPage gere le GET (affichage du form) et le POST (tentative de co)
+// Un user deja co est renvoye chez lui sans meme voir le formulaire
 func LoginPage(w http.ResponseWriter, r *http.Request) {
 	if RedirectIfAuthed(w, r) {
 		return
@@ -28,7 +28,7 @@ func LoginPage(w http.ResponseWriter, r *http.Request) {
 	emailOrPseudo := r.FormValue("email_or_pseudo")
 	password := r.FormValue("password")
 
-	// On garde la valeur saisie pour la ré-injecter dans le form en cas d'échec.
+	// On garde la valeur saisie pour la re-injecter dans le form en cas d'echec
 	form := map[string]any{"EmailOrPseudo": emailOrPseudo}
 	renderErr := func(msg string) {
 		form["Error"] = msg
@@ -47,8 +47,8 @@ func LoginPage(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
 
-// RegisterPage : même découpage que LoginPage, avec en plus la confirmation
-// du mot de passe (vérifiée ici, pas dans le service).
+// RegisterPage : meme decoupage que LoginPage, avec en plus la confirmation
+// du mdp (verifiee ici, pas dans le service)
 func RegisterPage(w http.ResponseWriter, r *http.Request) {
 	if RedirectIfAuthed(w, r) {
 		return
@@ -94,8 +94,8 @@ func RegisterPage(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
 
-// LogoutPage est volontairement POST-only : sans ça, un simple <img src="/logout">
-// posé sur un site tiers suffirait à déconnecter l'utilisateur (CSRF).
+// LogoutPage est volontairement POST-only : sans ca, un simple <img src="/logout">
+// pose sur un site tiers suffirait a deco le user (CSRF)
 func LogoutPage(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "méthode non autorisée", http.StatusMethodNotAllowed)
@@ -105,8 +105,9 @@ func LogoutPage(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
 
-// Me renvoie l'utilisateur connecté en JSON. Pas utilisé par le rendu des pages,
-// gardé sous la main pour un éventuel appel AJAX plus tard.
+// Me renvoie le user co en JSON
+// Pas utilise par le rendu des pages, garde sous la main pour un eventuel
+// appel AJAX plus tard
 func Me(w http.ResponseWriter, r *http.Request) {
 	user := currentUser(r)
 	if user == nil {

@@ -13,12 +13,12 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-// Register crée un compte. Les entrées sont nettoyées (espaces, casse) puis
-// validées avant d'écrire en base.
+// Register cree un compte
+// Les entrees sont nettoyees (espaces, casse) puis validees avant d'ecrire en base
 func Register(db *sql.DB, nom, pseudo, email, password string) (*models.User, error) {
-	// L'email est normalisé en minuscules pour qu'"Alice@Gmail.com" et
-	// "alice@gmail.com" pointent sur le même compte. Le pseudo, lui, reste
-	// sensible à la casse (choix de design : "Alice" ≠ "alice").
+	// L'email est normalise en lowercase pour qu'"Alice@Gmail.com" et
+	// "alice@gmail.com" pointent sur le meme compte
+	// Le pseudo lui reste sensible a la casse (choix de design : "Alice" ≠ "alice")
 	nom = strings.TrimSpace(nom)
 	pseudo = strings.TrimSpace(pseudo)
 	email = strings.ToLower(strings.TrimSpace(email))
@@ -36,9 +36,9 @@ func Register(db *sql.DB, nom, pseudo, email, password string) (*models.User, er
 		return nil, errors.New("mot de passe trop court (min 8 caractères)")
 	}
 
-	// On vérifie l'unicité explicitement pour pouvoir donner un message ciblé
-	// ("email déjà utilisé" plutôt qu'un échec d'INSERT générique). La contrainte
-	// UNIQUE de la DB sert quand même de filet en cas de course concurrente.
+	// On verifie l'unicite explicitement pour pouvoir donner un message cible
+	// ("email deja utilise" plutot qu'un echec d'INSERT generique)
+	// La contrainte UNIQUE de la DB sert quand meme de filet en cas de course concurrente
 	var exists int
 	db.QueryRow(`SELECT COUNT(*) FROM users WHERE email = ?`, email).Scan(&exists)
 	if exists > 0 {
@@ -72,9 +72,9 @@ func Register(db *sql.DB, nom, pseudo, email, password string) (*models.User, er
 	}, nil
 }
 
-// Login accepte indifféremment un email ou un pseudo dans le même champ.
-// Le message d'erreur reste identique (compte introuvable / mauvais mot de passe)
-// pour ne pas révéler quels comptes existent.
+// Login accepte indifferemment un email ou un pseudo dans le meme champ
+// Le message d'erreur reste identique (compte introuvable / mauvais mdp)
+// pour ne pas reveler quels comptes existent
 func Login(db *sql.DB, emailOrPseudo, password string) (*models.User, error) {
 	emailOrPseudo = strings.TrimSpace(emailOrPseudo)
 	user := &models.User{}
@@ -103,7 +103,7 @@ func Login(db *sql.DB, emailOrPseudo, password string) (*models.User, error) {
 	return user, nil
 }
 
-// CreateSession génère un token, l'enregistre en base et pose le cookie côté client.
+// CreateSession genere un token, l'enregistre en base et pose le cookie cote client
 func CreateSession(db *sql.DB, w http.ResponseWriter, userID int) error {
 	sessionID, err := utils.GenerateSessionID()
 	if err != nil {
@@ -124,8 +124,8 @@ func CreateSession(db *sql.DB, w http.ResponseWriter, userID int) error {
 	return nil
 }
 
-// Logout efface la session côté DB et côté cookie. Si le cookie est absent
-// (utilisateur déjà déconnecté), on ne fait rien de bruyant.
+// Logout efface la session cote DB et cote cookie
+// Si le cookie est absent (user deja deco), on ne fait rien de bruyant
 func Logout(db *sql.DB, w http.ResponseWriter, r *http.Request) {
 	cookie, err := r.Cookie(utils.SessionCookieName)
 	if err == nil {
@@ -134,14 +134,14 @@ func Logout(db *sql.DB, w http.ResponseWriter, r *http.Request) {
 	utils.ClearSessionCookie(w)
 }
 
-// DeleteExpiredSessions vide la table des sessions périmées en une requête.
+// DeleteExpiredSessions vide la table des sessions perimees en une requete
 func DeleteExpiredSessions(db *sql.DB) {
 	db.Exec(`DELETE FROM sessions WHERE expires_at <= datetime('now')`)
 }
 
-// StartSessionCleanup lance une goroutine qui purge les sessions expirées à
-// intervalles réguliers, pour la durée de vie du programme. À appeler une fois
-// au démarrage.
+// StartSessionCleanup lance une goroutine qui purge les sessions expirees
+// a intervalles reguliers, pour la duree de vie du programme
+// A appeler une fois au demarrage
 func StartSessionCleanup(db *sql.DB, interval time.Duration) {
 	go func() {
 		ticker := time.NewTicker(interval)

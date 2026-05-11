@@ -13,10 +13,15 @@ import (
 const SessionCookieName = "session_id"
 const SessionDuration = 24 * time.Hour
 
+// CookieSecure pose le flag Secure sur le cookie de session
+// A mettre a true en HTTPS (prod) et false en HTTP (dev)
+// Configure depuis main.go via la variable d'env COOKIE_SECURE
+var CookieSecure bool
+
 // --- Session ---
 
-// GenerateSessionID renvoie 32 octets aléatoires encodés en hex (64 caractères).
-// Suffisant pour un identifiant de session non devinable.
+// GenerateSessionID renvoie 32 octets aleatoires encodes en hex (64 caracteres)
+// Suffisant pour un id de session non devinable
 func GenerateSessionID() (string, error) {
 	b := make([]byte, 32)
 	if _, err := rand.Read(b); err != nil {
@@ -25,9 +30,9 @@ func GenerateSessionID() (string, error) {
 	return hex.EncodeToString(b), nil
 }
 
-// SetSessionCookie pose le cookie de session sur la réponse.
-//   - HttpOnly : empêche le JS de lire le cookie (mitigation XSS).
-//   - SameSite=Lax : bloque la majorité des requêtes cross-site (mitigation CSRF).
+// SetSessionCookie pose le cookie de session sur la reponse
+//   - HttpOnly : empeche le JS de lire le cookie (mitigation XSS)
+//   - SameSite=Lax : bloque la majorite des requetes cross-site (mitigation CSRF)
 func SetSessionCookie(w http.ResponseWriter, sessionID string, expires time.Time) {
 	http.SetCookie(w, &http.Cookie{
 		Name:     SessionCookieName,
@@ -36,11 +41,11 @@ func SetSessionCookie(w http.ResponseWriter, sessionID string, expires time.Time
 		Expires:  expires,
 		HttpOnly: true,
 		SameSite: http.SameSiteLaxMode,
-		// Secure: true, // à passer à true le jour où on tourne en HTTPS
+		Secure:   CookieSecure,
 	})
 }
 
-// ClearSessionCookie demande au navigateur d'oublier le cookie.
+// ClearSessionCookie demande au browser d'oublier le cookie
 func ClearSessionCookie(w http.ResponseWriter) {
 	http.SetCookie(w, &http.Cookie{
 		Name:     SessionCookieName,
@@ -51,8 +56,9 @@ func ClearSessionCookie(w http.ResponseWriter) {
 	})
 }
 
-// GetUserIDFromSession lit le cookie, vérifie la session en base et renvoie
-// l'user_id. Retourne 0 si pas de cookie, session inconnue ou expirée.
+// GetUserIDFromSession lit le cookie, verifie la session en base et renvoie
+// l'user_id
+// Retourne 0 si pas de cookie, session inconnue ou expiree
 func GetUserIDFromSession(r *http.Request, db *sql.DB) int {
 	cookie, err := r.Cookie(SessionCookieName)
 	if err != nil {
@@ -68,8 +74,9 @@ func GetUserIDFromSession(r *http.Request, db *sql.DB) int {
 	return userID
 }
 
-// RequireAuth est la garde côté API : si non connecté, on répond 401 JSON et
-// retourne 0. Pour les pages HTML, voir handlers.RequirePageAuth.
+// RequireAuth est la garde cote API : si non co, on repond 401 JSON et
+// retourne 0
+// Pour les pages HTML, voir handlers.RequirePageAuth
 func RequireAuth(w http.ResponseWriter, r *http.Request, db *sql.DB) int {
 	userID := GetUserIDFromSession(r, db)
 	if userID == 0 {
@@ -83,9 +90,9 @@ func RequireAuth(w http.ResponseWriter, r *http.Request, db *sql.DB) int {
 
 var pseudoRegex = regexp.MustCompile(`^[a-zA-Z0-9_-]+$`)
 
-// IsValidEmail accepte une adresse seule et refuse la forme "Nom <email>".
-// Par défaut mail.ParseAddress autorise les deux ; on compare donc avec
-// l'adresse parsée pour être strict.
+// IsValidEmail accepte une adresse seule et refuse la forme "Nom <email>"
+// Par defaut mail.ParseAddress autorise les deux, on compare donc avec
+// l'adresse parsee pour etre strict
 func IsValidEmail(email string) bool {
 	addr, err := mail.ParseAddress(email)
 	if err != nil {

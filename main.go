@@ -9,6 +9,7 @@ import (
 	"forum-diapason/database"
 	"forum-diapason/handlers"
 	"forum-diapason/services"
+	"forum-diapason/utils"
 )
 
 func getEnv(key, fallback string) string {
@@ -21,13 +22,14 @@ func getEnv(key, fallback string) string {
 func main() {
 	port := getEnv("PORT", "8080")
 	dbFile := getEnv("DB_FILE", "./forum.db")
+	utils.CookieSecure = getEnv("COOKIE_SECURE", "false") == "true"
 
 	db := database.Init(dbFile)
 	defer db.Close()
 
 	handlers.Init(db)
 
-	// Sinon la table sessions grossit indéfiniment
+	// Sinon la table sessions grossit indefiniment
 	services.StartSessionCleanup(db, time.Hour)
 
 	// Pages
@@ -41,12 +43,11 @@ func main() {
 	http.HandleFunc("/login", handlers.LoginPage)
 	http.HandleFunc("/register", handlers.RegisterPage)
 	http.HandleFunc("/logout", handlers.LogoutPage)
-	http.HandleFunc("/profile", func(w http.ResponseWriter, r *http.Request) {
-		if handlers.RequirePageAuth(w, r) == 0 {
-			return
-		}
-		handlers.RenderPage(w, r, "profile", nil)
-	})
+	http.HandleFunc("/profile", handlers.ProfilePage)
+	http.HandleFunc("/profile/edit", handlers.ProfileEditPage)
+	http.HandleFunc("/profile/avatar", handlers.ProfileAvatarPage)
+	http.HandleFunc("/profile/avatar/delete", handlers.ProfileAvatarDeletePage)
+	http.HandleFunc("/profile/password", handlers.ProfilePasswordPage)
 	http.HandleFunc("/post", func(w http.ResponseWriter, r *http.Request) {
 		handlers.RenderPage(w, r, "post", nil)
 	})
@@ -58,6 +59,8 @@ func main() {
 	http.Handle("/css/", http.FileServer(http.Dir("./frontend/")))
 	http.Handle("/js/", http.FileServer(http.Dir("./frontend/")))
 	http.Handle("/data/", http.FileServer(http.Dir("./frontend/")))
+	http.Handle("/avatars/", http.FileServer(http.Dir("./public/")))
+	http.Handle("/image/", http.FileServer(http.Dir("./public/")))
 
 	log.Println("Serveur lancé sur http://localhost:" + port)
 	log.Fatal(http.ListenAndServe(":"+port, nil))
