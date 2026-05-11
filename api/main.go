@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strconv"
 	"strings"
 
 	"forum-diapason/database"
@@ -70,6 +71,9 @@ func main() {
 
 	mux.HandleFunc("/api/tags", handlers.Tags)
 
+	// Users
+	mux.HandleFunc("/api/users/", usersRouter)
+
 	log.Println("API démarrée sur http://localhost:" + port)
 	log.Fatal(http.ListenAndServe(":"+port, cors(mux)))
 }
@@ -129,6 +133,44 @@ func authLogin(w http.ResponseWriter, r *http.Request) {
 func authLogout(w http.ResponseWriter, r *http.Request) {
 	services.Logout(db, w, r)
 	writeJSON(w, http.StatusOK, map[string]string{"message": "déconnecté"})
+}
+
+func parseID(path, prefix string) int {
+	s := strings.TrimPrefix(path, prefix)
+	if i := strings.Index(s, "/"); i != -1 {
+		s = s[:i]
+	}
+	id, _ := strconv.Atoi(s)
+	return id
+}
+
+func usersRouter(w http.ResponseWriter, r *http.Request) {
+	path := r.URL.Path
+	switch {
+	case strings.HasSuffix(path, "/follow"):
+		handlers.FollowUser(w, r)
+	case strings.HasSuffix(path, "/following"):
+		handlers.GetFollowing(w, r)
+	case strings.HasSuffix(path, "/followers"):
+		handlers.GetFollowers(w, r)
+	case strings.HasSuffix(path, "/posts"):
+		userID := parseID(path, "/api/users/")
+		currentUserID := utils.GetUserIDFromSession(r, db)
+		posts, err := services.GetPostsByUser(db, userID, currentUserID, 20, 0)
+		if err != nil {
+			writeError(w, http.StatusInternalServerError, "erreur serveur")
+			return
+		}
+		writeJSON(w, http.StatusOK, posts)
+	default:
+		userID := parseID(path, "/api/users/")
+		user, err := services.GetUserByID(db, userID)
+		if err != nil {
+			writeError(w, http.StatusNotFound, err.Error())
+			return
+		}
+		writeJSON(w, http.StatusOK, user)
+	}
 }
 
 func postsRouter(w http.ResponseWriter, r *http.Request) {

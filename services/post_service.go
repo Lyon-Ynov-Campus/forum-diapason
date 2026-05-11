@@ -321,3 +321,31 @@ func scanUsers(rows *sql.Rows) ([]*models.User, error) {
 	}
 	return users, nil
 }
+
+func GetPostsByUser(db *sql.DB, authorID, currentUserID, limit, offset int) ([]*models.Post, error) {
+	rows, err := db.Query(`
+		SELECT p.id, p.user_id, p.titre, p.contenu, p.media_type, p.date_publication,
+		       u.pseudo, u.photo_url,
+		       (SELECT COUNT(*) FROM likes    WHERE post_id  = p.id) AS like_count,
+		       (SELECT COUNT(*) FROM comments WHERE posts_id = p.id) AS comment_count,
+		       (SELECT COUNT(*) FROM likes    WHERE post_id  = p.id AND user_id = ?) AS liked_by_me
+		FROM posts p JOIN users u ON u.id = p.user_id
+		WHERE p.user_id = ?
+		ORDER BY p.date_publication DESC
+		LIMIT ? OFFSET ?`, currentUserID, authorID, limit, offset)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var posts []*models.Post
+	for rows.Next() {
+		p := &models.Post{}
+		rows.Scan(&p.ID, &p.UserID, &p.Titre, &p.Contenu,
+			&p.MediaType, &p.DatePublication,
+			&p.AuthorPseudo, &p.AuthorPhoto,
+			&p.LikeCount, &p.CommentCount, &p.LikedByMe)
+		p.Tags = GetPostTags(db, p.ID)
+		posts = append(posts, p)
+	}
+	return posts, nil
+}
