@@ -176,4 +176,24 @@ document.addEventListener('DOMContentLoaded', () => {
     initEditProfileModal()
     initContactsModal()
     initFilterModal()
+    initPasswordToggle()
 })
+
+function initPasswordToggle() {
+    const toggleButtons = document.querySelectorAll('.toggle-password')
+    toggleButtons.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.preventDefault()
+            const targetId = btn.getAttribute('data-target')
+            const input = document.getElementById(targetId)
+            if (!input) return
+
+            const isPassword = input.type === 'password'
+            input.type = isPassword ? 'text' : 'password'
+
+            // Changer l'icône (ajouter une classe ou changer la couleur)
+            btn.classList.toggle('text-gray-700')
+            btn.classList.toggle('text-gray-500')
+        })
+    })
+}
