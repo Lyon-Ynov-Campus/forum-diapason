@@ -8,6 +8,7 @@ type Post struct {
 	Titre           string    `json:"titre"`
 	Contenu         string    `json:"contenu"`
 	MediaType       string    `json:"media_type"`
+	ImageURL        string    `json:"image_url,omitempty"`
 	DatePublication time.Time `json:"date_publication"`
 
 	// Champs calculés

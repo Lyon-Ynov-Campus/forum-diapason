@@ -371,3 +371,57 @@ func sendJSON(w http.ResponseWriter, statusCode int, data interface{}) {
 	w.WriteHeader(statusCode)
 	json.NewEncoder(w).Encode(data)
 }
+
+// GET /api/posts/top?limit=6
+func TopPosts(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		sendError(w, http.StatusMethodNotAllowed, "méthode non autorisée")
+		return
+	}
+	limit := 6
+	if l := r.URL.Query().Get("limit"); l != "" {
+		if v, err := strconv.Atoi(l); err == nil && v > 0 {
+			limit = v
+		}
+	}
+	posts, err := services.GetTopPosts(db, utils.GetUserIDFromSession(r, db), limit)
+	if err != nil {
+		sendError(w, http.StatusInternalServerError, "erreur serveur")
+		return
+	}
+	sendJSON(w, http.StatusOK, posts)
+}
+
+// POST /api/posts/{id}/image
+func UploadPostImage(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		sendError(w, http.StatusMethodNotAllowed, "méthode non autorisée")
+		return
+	}
+	userID := utils.RequireAuth(w, r, db)
+	if userID == 0 {
+		return
+	}
+	postID, err := parseID(r.URL.Path, "/api/posts/")
+	if err != nil {
+		sendError(w, http.StatusBadRequest, "ID invalide")
+		return
+	}
+	r.Body = http.MaxBytesReader(w, r.Body, services.AvatarMaxSize)
+	if err := r.ParseMultipartForm(services.AvatarMaxSize); err != nil {
+		sendError(w, http.StatusBadRequest, "image trop lourde")
+		return
+	}
+	file, header, err := r.FormFile("image")
+	if err != nil {
+		sendError(w, http.StatusBadRequest, "fichier manquant")
+		return
+	}
+	defer file.Close()
+	url, err := services.UploadPostImage(db, postID, file, header)
+	if err != nil {
+		sendError(w, http.StatusBadRequest, err.Error())
+		return
+	}
+	sendJSON(w, http.StatusOK, map[string]string{"image_url": url})
+}

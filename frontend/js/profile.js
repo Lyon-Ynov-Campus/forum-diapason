@@ -10,13 +10,13 @@ function timeAgo(dateStr) {
 function createPostCard(post) {
     const card = document.getElementById('post-card').content.cloneNode(true)
     const authorEl = card.querySelector('.post-author')
-    authorEl.textContent = post.author
-    authorEl.href = `/profile?id=${post.author_id}`
-    card.querySelector('.post-title').textContent = post.title
-    card.querySelector('.post-content').textContent = post.content
-    card.querySelector('.post-date').textContent = timeAgo(post.created_at)
+    authorEl.textContent = post.author_pseudo
+    authorEl.href = `/profile?id=${post.user_id}`
+    card.querySelector('.post-title').textContent = post.titre
+    card.querySelector('.post-content').textContent = post.contenu
+    card.querySelector('.post-date').textContent = timeAgo(post.date_publication)
     card.querySelector('.post-tags').textContent = (post.tags || []).map(t => `#${t}`).join(' ')
-    card.querySelector('.post-likes').textContent = post.likes
+    card.querySelector('.post-likes').textContent = post.like_count
 
     const article = card.querySelector('article')
     article.style.cursor = 'pointer'
@@ -24,32 +24,32 @@ function createPostCard(post) {
         if (e.target.closest('button')) return
         window.location.href = `/post?id=${post.id}`
     })
-
+    initPostCard(article, post)
     return card
 }
 
-const profileId = parseInt(new URLSearchParams(window.location.search).get('id')) || 1
+const params      = new URLSearchParams(window.location.search)
+const profileId   = parseInt(params.get('id')) || null
+const profilePseudo = params.get('pseudo') || null
 
-Promise.all([
-    fetch('/data/profile.json').then(r => r.json()),
-    fetch('/data/posts.json').then(r => r.json())
-]).then(([profileData, posts]) => {
-    // Compatibilité ancien format objet / nouveau format tableau
-    const profiles = Array.isArray(profileData) ? profileData : [profileData]
-    const profile = profiles.find(p => p.id === profileId) || profiles[0]
-    if (!profile) return
+const userId = profileId || 1
 
-    document.getElementById('profile-pseudo').textContent = profile.pseudo
-    document.querySelector('#profile-ville span:last-child').textContent = profile.ville
-    document.getElementById('profile-followers').textContent = profile.followers
-    document.getElementById('profile-posts').textContent = profile.posts
-
-    const userPosts = posts.filter(p => p.author_id === profile.id)
+fetch(`${API}/api/users/${userId}/posts`)
+    .then(r => r.json())
+    .then(posts => {
     const container = document.getElementById('profile-posts-container')
-    userPosts.forEach(post => container.appendChild(createPostCard(post)))
+    if (!container) return
 
-    // Bouton edit → ouvre le modal pré-rempli
+    const noPostsEl = document.getElementById('profile-no-posts')
+
+    if (!posts || posts.length === 0) return
+
+    // Cache le message "aucun post"
+    if (noPostsEl) noPostsEl.remove()
+
+    ;(posts || []).forEach(post => container.appendChild(createPostCard(post)))
+
     document.getElementById('open-edit-profile-btn')?.addEventListener('click', () => {
-        openEditProfileModal(profile)
+        openEditProfileModal(currentUser || {})
     })
 })
