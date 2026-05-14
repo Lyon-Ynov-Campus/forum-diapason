@@ -18,6 +18,17 @@ function createPostCard(post) {
     card.querySelector('.post-tags').textContent = (post.tags || []).map(t => `#${t}`).join(' ')
     card.querySelector('.post-likes').textContent = post.like_count
 
+    // Afficher la photo de l'auteur si elle existe
+    if (post.author_photo) {
+        const img = card.querySelector('.post-author-photo')
+        const def = card.querySelector('.post-author-avatar-default')
+        if (img) {
+            img.src = post.author_photo
+            img.classList.remove('hidden')
+        }
+        if (def) def.classList.add('hidden')
+    }
+
     const article = card.querySelector('article')
     article.style.cursor = 'pointer'
     article.addEventListener('click', (e) => {
