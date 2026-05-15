@@ -37,6 +37,25 @@ function createPostCard(post) {
     return card
 }
 
+function createUserCard(user) {
+    const div = document.createElement('div')
+    div.className = 'border border-gray-200 p-4 hover:bg-gray-50 cursor-pointer transition'
+    div.style.cursor = 'pointer'
+    div.innerHTML = `
+        <div class="flex items-center gap-3">
+            <img src="${user.photo_url || 'https://via.placeholder.com/40'}" alt="${user.pseudo}" class="w-10 h-10 rounded-full object-cover">
+            <div>
+                <p class="font-bold text-sm">${user.pseudo}</p>
+                <p class="text-xs text-gray-500">👤 Utilisateur</p>
+            </div>
+        </div>
+    `
+    div.addEventListener('click', () => {
+        window.location.href = `/profile?id=${user.id}`
+    })
+    return div
+}
+
 function createTopPostCard(post) {
     const card = document.getElementById('top-post-card').content.cloneNode(true)
     const a = card.querySelector('.top-post-author')
@@ -47,35 +66,120 @@ function createTopPostCard(post) {
     return card
 }
 
+const postsFilter = { q: '', sort: '', tags: [] }
+
 function loadPosts() {
-    fetch(`${API}/api/posts`, { credentials: 'include' })
-        .then(r => r.json())
+    const container = document.getElementById('posts-container')
+    if (container) container.innerHTML = ''
+
+    // Si y a une recherche textuelle ET pas de tags/tri -> utiliser l'API de recherche globale
+    if (postsFilter.q && !postsFilter.sort && postsFilter.tags.length === 0) {
+        return loadSearchResults()
+    }
+
+    // Sinon utiliser l'API posts avec filtres
+    const params = new URLSearchParams()
+    if (postsFilter.q)          params.set('q', postsFilter.q)
+    if (postsFilter.sort)       params.set('sort', postsFilter.sort)
+    if (postsFilter.tags.length) params.set('tags', postsFilter.tags.join(','))
+
+    const url = `${API}/api/posts?${params.toString()}`
+    console.log('loadPosts - URL de la requête:', url)
+    console.log('loadPosts - postsFilter:', postsFilter)
+
+    fetch(url, { credentials: 'include' })
+        .then(r => {
+            console.log('loadPosts - Réponse reçue:', r.status)
+            return r.json()
+        })
         .then(posts => {
-            if (!Array.isArray(posts)) return
-            const container = document.getElementById('posts-container')
+            console.log('loadPosts - Posts reçus:', posts)
+            if (!Array.isArray(posts)) {
+                console.error('loadPosts - Réponse non-array:', posts)
+                return
+            }
+            if (posts.length === 0 && container) {
+                container.innerHTML = '<p class="text-sm text-gray-400 text-center py-8">Aucun post trouvé</p>'
+                console.log('loadPosts - Aucun post trouvé')
+                return
+            }
+            console.log('loadPosts - Ajout de', posts.length, 'posts')
             posts.forEach(post => container?.appendChild(createPostCard(post)))
         })
+        .catch(err => {
+            console.error('loadPosts - Erreur fetch:', err)
+        })
+}
+
+function loadSearchResults() {
+    const container = document.getElementById('posts-container')
+    const url = `${API}/api/search?q=${encodeURIComponent(postsFilter.q)}`
+    console.log('loadSearchResults - URL:', url)
+
+    fetch(url, { credentials: 'include' })
+        .then(r => r.json())
+        .then(results => {
+            console.log('loadSearchResults - Résultats:', results)
+            if (!Array.isArray(results)) return
+            
+            if (results.length === 0 && container) {
+                container.innerHTML = '<p class="text-sm text-gray-400 text-center py-8">Aucun résultat trouvé pour "<strong>' + postsFilter.q + '</strong>"</p>'
+                return
+            }
+            
+            results.forEach(result => {
+                if (result.type === 'user' && result.user) {
+                    container?.appendChild(createUserCard(result.user))
+                } else if (result.type === 'post' && result.post) {
+                    container?.appendChild(createPostCard(result.post))
+                }
+            })
+        })
+        .catch(err => {
+            console.error('loadSearchResults - Erreur fetch:', err)
+        })
+}
+
+function loadTopPosts() {
+    const topContainer = document.getElementById('top-posts-container')
+    if (topContainer) topContainer.innerHTML = ''
 
     fetch(`${API}/api/posts/top?limit=6`, { credentials: 'include' })
         .then(r => r.json())
         .then(posts => {
-            if (!Array.isArray(posts)) {
-                console.error('top posts error:', posts)
-                return
-            }
-            const topContainer = document.getElementById('top-posts-container')
+            if (!Array.isArray(posts)) return
             posts.forEach(post => topContainer?.appendChild(createTopPostCard(post)))
         })
-        .catch(err => console.error('top posts fetch error:', err))
 }
 
-function reloadPosts() {
-    const container    = document.getElementById('posts-container')
-    const topContainer = document.getElementById('top-posts-container')
-    if (container)    container.innerHTML    = ''
-    if (topContainer) topContainer.innerHTML = ''
+function reloadPosts() { loadPosts(); loadTopPosts() }
+
+function initSearch() {
+    const input = document.getElementById('search-input')
+    if (!input) return
+    let t
+    input.addEventListener('input', () => {
+        clearTimeout(t)
+        t = setTimeout(() => {
+            postsFilter.q = input.value.trim()
+            loadPosts()
+        }, 300)
+    })
+}
+
+if (typeof checkAuth === 'function') {
+    checkAuth().then(() => { 
+        loadPosts()
+        loadTopPosts()
+    })
+} else {
     loadPosts()
+    loadTopPosts()
 }
 
-if (typeof checkAuth === 'function') checkAuth().then(loadPosts)
-else loadPosts()
+// Initialiser la recherche une fois que le DOM est prêt
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initSearch)
+} else {
+    initSearch()
+}

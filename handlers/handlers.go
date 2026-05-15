@@ -5,6 +5,7 @@ package handlers
 import (
 	"database/sql"
 	"encoding/json"
+	"forum-diapason/models"
 	"forum-diapason/services"
 	"forum-diapason/utils"
 	"net/http"
@@ -41,7 +42,22 @@ func Posts(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 
-		posts, err := services.GetPosts(db, currentUserID, limit, offset)
+		q    := r.URL.Query().Get("q")
+		sort := r.URL.Query().Get("sort")
+		var tags []string
+		for _, t := range strings.Split(r.URL.Query().Get("tags"), ",") {
+			if t = strings.TrimSpace(t); t != "" {
+				tags = append(tags, t)
+			}
+		}
+
+		var posts []*models.Post
+		var err error
+		if q != "" || sort != "" || len(tags) > 0 {
+			posts, err = services.SearchPosts(db, currentUserID, q, sort, tags, limit, offset)
+		} else {
+			posts, err = services.GetPosts(db, currentUserID, limit, offset)
+		}
 		if err != nil {
 			sendError(w, http.StatusInternalServerError, "erreur serveur")
 			return

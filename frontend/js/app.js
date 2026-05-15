@@ -291,6 +291,19 @@ function renderContacts(contacts, query = '') {
     }, { once: true })
 }
 
+function restoreFilterState() {
+    const selected = typeof postsFilter !== 'undefined' ? postsFilter.tags : []
+    const sort = typeof postsFilter !== 'undefined' ? postsFilter.sort : ''
+    
+    selected.forEach(tag => {
+        const input = document.querySelector(`input[name="tag"][value="${tag}"]`)
+        if (input) input.checked = true
+    })
+    
+    const sortInput = document.querySelector(`input[name="sort"][value="${sort}"]`)
+    if (sortInput) sortInput.checked = true
+}
+
 function initFilterModal() {
     const modal = document.getElementById('modal-filter')
     if (!modal) return
@@ -301,13 +314,26 @@ function initFilterModal() {
 
     document.querySelector('[data-open-filter]')?.addEventListener('click', () => {
         modal.classList.remove('hidden')
+        restoreFilterState()
     })
 
     document.getElementById('modal-filter-apply')?.addEventListener('click', () => {
         const sorts = [...document.querySelectorAll('input[name=sort]:checked')].map(i => i.value)
         const tags  = [...document.querySelectorAll('input[name=tag]:checked')].map(i => i.value)
-        // TODO: appliquer le filtre sur les posts quand l'API sera prête
-        console.log('Filtre:', { sorts, tags })
+        console.log('Filtrage appliqué:', { sort: sorts[0], tags })
+        if (typeof postsFilter !== 'undefined') {
+            postsFilter.sort = sorts[0] || ''
+            postsFilter.tags = tags
+            console.log('postsFilter mis à jour:', postsFilter)
+            if (typeof loadPosts === 'function') {
+                console.log('Appel de loadPosts()')
+                loadPosts()
+            } else {
+                console.error('loadPosts n\'est pas une fonction!')
+            }
+        } else {
+            console.error('postsFilter n\'est pas défini!')
+        }
         modal.classList.add('hidden')
     })
 }
