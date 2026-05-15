@@ -105,7 +105,7 @@ function render(post) {
         if (imageContainer) {
             const img = document.createElement('img')
             img.src = `http://localhost:8080${post.image_url}`
-            img.className = 'w-full h-full object-cover'
+            img.className = 'max-w-full max-h-[500px] object-contain mx-auto'
             img.alt = post.titre
             imageContainer.innerHTML = ''
             imageContainer.appendChild(img)
