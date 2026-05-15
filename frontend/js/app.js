@@ -145,6 +145,25 @@ function initPostCard(card, post) {
         })
     })
 
+    const deleteBtn = card.querySelector('.post-delete-btn')
+    if (deleteBtn && currentUser && post.user_id === currentUser.id) {
+        deleteBtn.classList.remove('hidden')
+        deleteBtn.addEventListener('click', async (e) => {
+            e.stopPropagation()
+            if (!confirm('Supprimer ce post ?')) return
+            const res = await fetch(`${API}/api/posts/${post.id}`, {
+                method: 'DELETE',
+                credentials: 'include'
+            })
+            if (res.ok) {
+                card.remove()
+                showToast('Post supprimé')
+            } else {
+                showToast('Suppression échouée')
+            }
+        })
+    }
+
     shareBtn?.addEventListener('click', (e) => {
         e.stopPropagation()
         navigator.clipboard.writeText(`${location.origin}/post?id=${post.id}`)

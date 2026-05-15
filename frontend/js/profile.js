@@ -21,7 +21,7 @@ function createPostCard(post) {
     if (post.image_url) {
         const img = document.createElement('img')
         img.src = `http://localhost:8080${post.image_url}`
-        img.className = 'w-full object-cover max-h-48 mt-1'
+        img.className = 'max-w-full max-h-96 object-contain mt-1 mx-auto'
         img.alt = post.titre
         const titleEl = card.querySelector('.post-title')
         titleEl?.insertAdjacentElement('afterend', img)
@@ -43,7 +43,7 @@ const profilePseudo = params.get('pseudo') || null
 
 const userId = profileId || 1
 
-fetch(`${API}/api/users/${userId}/posts`, { credentials: 'include' })
+const loadProfilePosts = () => fetch(`${API}/api/users/${userId}/posts`, { credentials: 'include' })
     .then(r => r.json())
     .then(posts => {
     const container = document.getElementById('profile-posts-container')
@@ -62,3 +62,6 @@ fetch(`${API}/api/users/${userId}/posts`, { credentials: 'include' })
         openEditProfileModal(currentUser || {})
     })
 })
+
+if (typeof checkAuth === 'function') checkAuth().then(loadProfilePosts)
+else loadProfilePosts()
