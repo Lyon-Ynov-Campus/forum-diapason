@@ -100,16 +100,16 @@ function render(post) {
     document.getElementById('post-likes').textContent   = post.like_count
 
     // Afficher l'image si elle existe
-    if (post.image_url) {
-        const imageContainer = document.getElementById('post-image-container')
-        if (imageContainer) {
-            const img = document.createElement('img')
-            img.src = `http://localhost:8080${post.image_url}`
-            img.className = 'max-w-full max-h-[500px] object-contain mx-auto'
-            img.alt = post.titre
-            imageContainer.innerHTML = ''
-            imageContainer.appendChild(img)
-        }
+    const imageContainer = document.getElementById('post-image-container')
+    if (post.image_url && imageContainer) {
+        const img = document.createElement('img')
+        img.src = `http://localhost:8080${post.image_url}`
+        img.className = 'max-w-full max-h-[500px] object-contain object-left'
+        img.alt = post.titre
+        imageContainer.innerHTML = ''
+        imageContainer.appendChild(img)
+    } else if (imageContainer) {
+        imageContainer.remove()
     }
 
     const likeBtn = document.querySelector('.post-detail-like')
