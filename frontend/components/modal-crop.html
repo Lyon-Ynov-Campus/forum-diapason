@@ -1,0 +1,24 @@
+{{define "modal-crop"}}
+<div id="modal-crop" class="hidden fixed inset-0 bg-black/60 z-50 flex items-center justify-center">
+    <div class="bg-white rounded-xl w-[90vw] max-w-2xl flex flex-col gap-4 p-6">
+
+        <div class="flex items-center justify-between">
+            <h2 class="font-bold text-base">Recadrer l'image</h2>
+            <button id="crop-close" class="text-gray-500 hover:text-black text-xl leading-none">×</button>
+        </div>
+
+        <p class="text-xs text-gray-500">Clique et glisse sur l'image pour définir la zone à garder.</p>
+
+        <div id="crop-container" class="relative bg-gray-100 select-none overflow-hidden flex items-center justify-center" style="height:60vh">
+            <img id="crop-image" class="max-w-full max-h-full pointer-events-none" draggable="false">
+            <div id="crop-overlay" class="absolute hidden border-2 border-dashed border-white shadow-[0_0_0_9999px_rgba(0,0,0,0.4)] pointer-events-none"></div>
+        </div>
+
+        <div class="flex justify-end gap-2">
+            <button id="crop-skip"    class="px-4 py-2 border border-gray-300 rounded text-sm hover:bg-gray-50">Ne pas recadrer</button>
+            <button id="crop-confirm" class="px-4 py-2 bg-black text-white rounded text-sm hover:bg-gray-800 disabled:opacity-40">Valider</button>
+        </div>
+
+    </div>
+</div>
+{{end}}

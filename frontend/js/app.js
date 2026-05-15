@@ -1,5 +1,107 @@
 
 const API = 'http://localhost:8081'
+const MAX_IMAGE_SIZE = 2 * 1024 * 1024
+
+function openCropModal(file) {
+    return new Promise((resolve) => {
+        const modal     = document.getElementById('modal-crop')
+        const img       = document.getElementById('crop-image')
+        const container = document.getElementById('crop-container')
+        const overlay   = document.getElementById('crop-overlay')
+        const confirm   = document.getElementById('crop-confirm')
+        const skip      = document.getElementById('crop-skip')
+        const close     = document.getElementById('crop-close')
+        if (!modal || !img) return resolve(file)
+
+        const url = URL.createObjectURL(file)
+        img.src = url
+        overlay.classList.add('hidden')
+        confirm.disabled = true
+        modal.classList.remove('hidden')
+
+        let start = null, rect = null
+
+        const onDown = (e) => {
+            const r = container.getBoundingClientRect()
+            const p = e.touches ? e.touches[0] : e
+            start = { x: p.clientX - r.left, y: p.clientY - r.top }
+            rect = { ...start, w: 0, h: 0 }
+        }
+        const onMove = (e) => {
+            if (!start) return
+            e.preventDefault()
+            const r = container.getBoundingClientRect()
+            const p = e.touches ? e.touches[0] : e
+            const cx = Math.max(0, Math.min(p.clientX - r.left, r.width))
+            const cy = Math.max(0, Math.min(p.clientY - r.top,  r.height))
+            rect = { x: Math.min(start.x, cx), y: Math.min(start.y, cy), w: Math.abs(cx - start.x), h: Math.abs(cy - start.y) }
+            overlay.style.cssText = `left:${rect.x}px;top:${rect.y}px;width:${rect.w}px;height:${rect.h}px`
+            overlay.classList.remove('hidden')
+            confirm.disabled = rect.w < 10 || rect.h < 10
+        }
+        const onUp = () => { start = null }
+
+        container.addEventListener('mousedown',  onDown)
+        document .addEventListener('mousemove',  onMove)
+        document .addEventListener('mouseup',    onUp)
+        container.addEventListener('touchstart', onDown)
+        document .addEventListener('touchmove',  onMove, { passive: false })
+        document .addEventListener('touchend',   onUp)
+
+        const cleanup = () => {
+            container.removeEventListener('mousedown',  onDown)
+            document .removeEventListener('mousemove',  onMove)
+            document .removeEventListener('mouseup',    onUp)
+            container.removeEventListener('touchstart', onDown)
+            document .removeEventListener('touchmove',  onMove)
+            document .removeEventListener('touchend',   onUp)
+            URL.revokeObjectURL(url)
+            modal.classList.add('hidden')
+        }
+
+        confirm.onclick = async () => {
+            if (!rect || rect.w < 10 || rect.h < 10) return
+            const imgRect       = img.getBoundingClientRect()
+            const containerRect = container.getBoundingClientRect()
+            const imgLeft = imgRect.left - containerRect.left
+            const imgTop  = imgRect.top  - containerRect.top
+            const sx = (rect.x - imgLeft) * (img.naturalWidth  / imgRect.width)
+            const sy = (rect.y - imgTop)  * (img.naturalHeight / imgRect.height)
+            const sw = rect.w * (img.naturalWidth  / imgRect.width)
+            const sh = rect.h * (img.naturalHeight / imgRect.height)
+
+            const canvas = document.createElement('canvas')
+            canvas.width = sw; canvas.height = sh
+            canvas.getContext('2d').drawImage(img, sx, sy, sw, sh, 0, 0, sw, sh)
+            const blob = await new Promise(r => canvas.toBlob(r, 'image/jpeg', 0.9))
+            cleanup()
+            resolve(new File([blob], file.name.replace(/\.\w+$/, '.jpg'), { type: 'image/jpeg' }))
+        }
+        skip.onclick  = () => { cleanup(); resolve(file) }
+        close.onclick = () => { cleanup(); resolve(file) }
+    })
+}
+
+async function compressImage(file, maxBytes = MAX_IMAGE_SIZE, maxDim = 1920) {
+    if (file.size <= maxBytes) return file
+    const bitmap = await createImageBitmap(file)
+    let { width, height } = bitmap
+    if (width > maxDim || height > maxDim) {
+        const ratio = Math.min(maxDim / width, maxDim / height)
+        width  = Math.round(width  * ratio)
+        height = Math.round(height * ratio)
+    }
+    const canvas = document.createElement('canvas')
+    canvas.width = width; canvas.height = height
+    canvas.getContext('2d').drawImage(bitmap, 0, 0, width, height)
+    for (const q of [0.85, 0.7, 0.55, 0.4]) {
+        const blob = await new Promise(r => canvas.toBlob(r, 'image/jpeg', q))
+        if (blob && blob.size <= maxBytes) {
+            return new File([blob], file.name.replace(/\.\w+$/, '.jpg'), { type: 'image/jpeg' })
+        }
+    }
+    return null
+}
 
 function showToast(msg) {
     const t = document.createElement('div')
@@ -310,13 +412,19 @@ function initCreatePost() {
             const post = await res.json()
             // Upload image si sélectionnée
             if (imageInput?.files[0]) {
-                const fd = new FormData()
-                fd.append('image', imageInput.files[0])
-                await fetch(`${API}/api/posts/${post.id}/image`, {
-                    method: 'POST',
-                    credentials: 'include',
-                    body: fd
-                })
+                const cropped    = await openCropModal(imageInput.files[0])
+                const compressed = await compressImage(cropped)
+                if (!compressed) {
+                    showToast('Image trop lourde, même après compression (max 2 Mo)')
+                } else {
+                    const fd = new FormData()
+                    fd.append('image', compressed)
+                    await fetch(`${API}/api/posts/${post.id}/image`, {
+                        method: 'POST',
+                        credentials: 'include',
+                        body: fd
+                    })
+                }
             }
             resetForm()
             showToast('Post publié !')
