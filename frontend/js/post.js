@@ -1,5 +1,7 @@
 function timeAgo(dateStr) {
-    const diff = Math.floor((Date.now() - new Date(dateStr)) / 60000)
+    const normalized = dateStr.replace(' +0000 UTC', 'Z').replace(' ', 'T')
+    const diff = Math.floor((Date.now() - new Date(normalized)) / 60000)
+    if (diff < 1) return "à l'instant"
     if (diff < 60) return `il y a ${diff} minute${diff > 1 ? 's' : ''}`
     const h = Math.floor(diff / 60)
     if (h < 24) return `il y a ${h} heure${h > 1 ? 's' : ''}`
@@ -76,8 +78,8 @@ const postId = parseInt(new URLSearchParams(window.location.search).get('id'))
 
 if (postId) {
     Promise.all([
-        fetch(`${API}/api/posts/${postId}`).then(r => r.json()),
-        fetch(`${API}/api/posts/${postId}/comments`).then(r => r.json())
+        fetch(`${API}/api/posts/${postId}`, { credentials: 'include' }).then(r => r.json()),
+        fetch(`${API}/api/posts/${postId}/comments`, { credentials: 'include' }).then(r => r.json())
     ]).then(([post, comments]) => {
         render(post)
         const list = document.getElementById('comments-list')

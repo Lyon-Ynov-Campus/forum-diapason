@@ -1,5 +1,7 @@
 function timeAgo(dateStr) {
-    const diff = Math.floor((Date.now() - new Date(dateStr)) / 60000)
+    const normalized = dateStr.replace(' +0000 UTC', 'Z').replace(' ', 'T')
+    const diff = Math.floor((Date.now() - new Date(normalized)) / 60000)
+    if (diff < 1) return "à l'instant"
     if (diff < 60) return `il y a ${diff} minute${diff > 1 ? 's' : ''}`
     const h = Math.floor(diff / 60)
     if (h < 24) return `il y a ${h} heure${h > 1 ? 's' : ''}`
@@ -18,15 +20,15 @@ function createPostCard(post) {
     card.querySelector('.post-tags').textContent = (post.tags || []).map(t => `#${t}`).join(' ')
     card.querySelector('.post-likes').textContent = post.like_count
 
-    // Afficher la photo de l'auteur si elle existe
-    if (post.author_photo) {
-        const img = card.querySelector('.post-author-photo')
-        const def = card.querySelector('.post-author-avatar-default')
-        if (img) {
-            img.src = post.author_photo
-            img.classList.remove('hidden')
-        }
-        if (def) def.classList.add('hidden')
+    // Avatar auteur
+    const photoImg = card.querySelector('.post-author-photo')
+    const photoDefault = card.querySelector('.post-author-avatar-default')
+    if (post.author_photo && post.author_photo !== '' && photoImg) {
+        photoImg.src = post.author_photo.startsWith('http')
+            ? post.author_photo
+            : post.author_photo.split('?')[0]
+        photoImg.classList.remove('hidden')
+        if (photoDefault) photoDefault.classList.add('hidden')
     }
 
     const article = card.querySelector('article')
@@ -39,28 +41,23 @@ function createPostCard(post) {
     return card
 }
 
-const params      = new URLSearchParams(window.location.search)
-const profileId   = parseInt(params.get('id')) || null
-const profilePseudo = params.get('pseudo') || null
+const params = new URLSearchParams(window.location.search)
+const profileId = parseInt(params.get('id')) || null
+//const profilePseudo = params.get('pseudo') || null
 
 const userId = profileId || 1
 
-fetch(`${API}/api/users/${userId}/posts`)
+fetch(`${API}/api/users/${userId}/posts`, { credentials: 'include' })
     .then(r => r.json())
     .then(posts => {
-    const container = document.getElementById('profile-posts-container')
-    if (!container) return
-
-    const noPostsEl = document.getElementById('profile-no-posts')
-
-    if (!posts || posts.length === 0) return
-
-    // Cache le message "aucun post"
-    if (noPostsEl) noPostsEl.remove()
-
-    ;(posts || []).forEach(post => container.appendChild(createPostCard(post)))
-
-    document.getElementById('open-edit-profile-btn')?.addEventListener('click', () => {
-        openEditProfileModal(currentUser || {})
+        const container = document.getElementById('profile-posts-container')
+        if (!container) return
+        const noPostsEl = document.getElementById('profile-no-posts')
+        if (!posts || posts.length === 0) return
+        if (noPostsEl) noPostsEl.remove()
+        posts.forEach(post => container.appendChild(createPostCard(post)))
     })
+
+document.getElementById('open-edit-profile-btn')?.addEventListener('click', () => {
+    openEditProfileModal(currentUser || {})
 })

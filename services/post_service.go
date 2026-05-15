@@ -368,9 +368,9 @@ func GetPostsByUser(db *sql.DB, authorID, currentUserID, limit, offset int) ([]*
 	for rows.Next() {
 		p := &models.Post{}
 		rows.Scan(&p.ID, &p.UserID, &p.Titre, &p.Contenu,
-			&p.MediaType, &p.DatePublication, &p.ImageURL,
-			&p.AuthorPseudo, &p.AuthorPhoto,
-			&p.LikeCount, &p.CommentCount, &p.LikedByMe)
+    			&p.MediaType, &p.ImageURL, &p.DatePublication,
+    			&p.AuthorPseudo, &p.AuthorPhoto,
+    			&p.LikeCount, &p.CommentCount, &p.LikedByMe)
 		p.Tags = GetPostTags(db, p.ID)
 		posts = append(posts, p)
 	}
