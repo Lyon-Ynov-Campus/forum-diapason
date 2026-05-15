@@ -11,9 +11,9 @@ import (
 )
 
 type SearchResult struct {
-	Type   string      `json:"type"` // "user" ou "post"
-	User   *models.User `json:"user,omitempty"`
-	Post   *models.Post `json:"post,omitempty"`
+	Type string       `json:"type"` // "user" ou "post"
+	User *models.User `json:"user,omitempty"`
+	Post *models.Post `json:"post,omitempty"`
 }
 
 // GET /api/search?q=...
@@ -25,7 +25,7 @@ func Search(w http.ResponseWriter, r *http.Request) {
 
 	currentUserID := utils.GetUserIDFromSession(r, db)
 	q := strings.TrimSpace(r.URL.Query().Get("q"))
-	
+
 	if q == "" {
 		sendJSON(w, http.StatusOK, []SearchResult{})
 		return
