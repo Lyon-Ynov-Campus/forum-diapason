@@ -9,10 +9,10 @@ function showToast(msg) {
     setTimeout(() => t.remove(), 2000)
 }
 
-// --- Interactions post card ---
+// --- Interactions post card — l'API est seule source de vérité ---
 function initPostCard(card, post) {
-    let liked = post.liked_by_me || false
-    let count = post.like_count  || 0
+    let liked = !!post.liked_by_me
+    let count = post.like_count || 0
 
     const likeBtn    = card.querySelector('.post-like-btn')
     const heart      = card.querySelector('.post-heart')
@@ -20,23 +20,26 @@ function initPostCard(card, post) {
     const shareBtn   = card.querySelector('.post-share-btn')
     const commentBtn = card.querySelector('.post-comment-btn')
 
-    if (liked) {
-        heart?.setAttribute('fill', '#ef4444')
-        heart?.setAttribute('stroke', '#ef4444')
-        likeBtn?.classList.add('text-red-500')
+    const paint = () => {
+        if (likesEl) likesEl.textContent = count
+        heart?.setAttribute('fill', liked ? '#ef4444' : 'none')
+        heart?.setAttribute('stroke', liked ? '#ef4444' : 'currentColor')
+        likeBtn?.classList.toggle('text-red-500', liked)
     }
+    paint()
 
     likeBtn?.addEventListener('click', (e) => {
         e.stopPropagation()
         liked = !liked
         count += liked ? 1 : -1
-        if (likesEl) likesEl.textContent = count
-        heart?.setAttribute('fill', liked ? '#ef4444' : 'none')
-        heart?.setAttribute('stroke', liked ? '#ef4444' : 'currentColor')
-        likeBtn.classList.toggle('text-red-500', liked)
+        paint()
         fetch(`${API}/api/posts/${post.id}/like`, {
             method: liked ? 'POST' : 'DELETE',
             credentials: 'include'
+        }).catch(() => {
+            liked = !liked
+            count += liked ? 1 : -1
+            paint()
         })
     })
 

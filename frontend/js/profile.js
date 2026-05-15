@@ -34,7 +34,7 @@ const profilePseudo = params.get('pseudo') || null
 
 const userId = profileId || 1
 
-fetch(`${API}/api/users/${userId}/posts`)
+fetch(`${API}/api/users/${userId}/posts`, { credentials: 'include' })
     .then(r => r.json())
     .then(posts => {
     const container = document.getElementById('profile-posts-container')
