@@ -76,8 +76,8 @@ const postId = parseInt(new URLSearchParams(window.location.search).get('id'))
 
 if (postId) {
     Promise.all([
-        fetch(`${API}/api/posts/${postId}`).then(r => r.json()),
-        fetch(`${API}/api/posts/${postId}/comments`).then(r => r.json())
+        fetch(`${API}/api/posts/${postId}`,          { credentials: 'include' }).then(r => r.json()),
+        fetch(`${API}/api/posts/${postId}/comments`, { credentials: 'include' }).then(r => r.json())
     ]).then(([post, comments]) => {
         render(post)
         const list = document.getElementById('comments-list')
@@ -112,27 +112,33 @@ function render(post) {
         }
     }
 
-    // Like + share
     const likeBtn = document.querySelector('.post-detail-like')
     const heart   = document.querySelector('.post-detail-heart')
-    let liked = post.liked_by_me
-    let count = post.like_count
+    const likesEl = document.getElementById('post-likes')
+    let liked = !!post.liked_by_me
+    let count = post.like_count || 0
 
-    if (liked) {
-        heart?.setAttribute('fill', '#ef4444')
-        heart?.setAttribute('stroke', '#ef4444')
-        likeBtn?.classList.add('text-red-500')
+    const paint = () => {
+        if (likesEl) likesEl.textContent = count
+        heart?.setAttribute('fill', liked ? '#ef4444' : 'none')
+        heart?.setAttribute('stroke', liked ? '#ef4444' : 'currentColor')
+        likeBtn?.classList.toggle('text-red-500', liked)
     }
+    paint()
 
     likeBtn?.addEventListener('click', () => {
         liked = !liked
         count += liked ? 1 : -1
-        document.getElementById('post-likes').textContent = count
-        heart?.setAttribute('fill', liked ? '#ef4444' : 'none')
-        heart?.setAttribute('stroke', liked ? '#ef4444' : 'currentColor')
-        likeBtn.classList.toggle('text-red-500', liked)
-        const method = liked ? 'POST' : 'DELETE'
-        fetch(`${API}/api/posts/${post.id}/like`, { method, credentials: 'include' })
+        paint()
+        fetch(`${API}/api/posts/${post.id}/like`, {
+            method: liked ? 'POST' : 'DELETE',
+            credentials: 'include'
+        }).catch(() => {
+            // rollback en cas d'erreur réseau
+            liked = !liked
+            count += liked ? 1 : -1
+            paint()
+        })
     })
 
     document.querySelector('.post-detail-share')?.addEventListener('click', () => {

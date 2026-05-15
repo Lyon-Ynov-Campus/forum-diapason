@@ -9,10 +9,10 @@ function showToast(msg) {
     setTimeout(() => t.remove(), 2000)
 }
 
-// --- Interactions post card ---
+// --- Interactions post card — l'API est seule source de vérité ---
 function initPostCard(card, post) {
-    let liked = post.liked_by_me || false
-    let count = post.like_count  || 0
+    let liked = !!post.liked_by_me
+    let count = post.like_count || 0
 
     const likeBtn    = card.querySelector('.post-like-btn')
     const heart      = card.querySelector('.post-heart')
@@ -20,23 +20,26 @@ function initPostCard(card, post) {
     const shareBtn   = card.querySelector('.post-share-btn')
     const commentBtn = card.querySelector('.post-comment-btn')
 
-    if (liked) {
-        heart?.setAttribute('fill', '#ef4444')
-        heart?.setAttribute('stroke', '#ef4444')
-        likeBtn?.classList.add('text-red-500')
+    const paint = () => {
+        if (likesEl) likesEl.textContent = count
+        heart?.setAttribute('fill', liked ? '#ef4444' : 'none')
+        heart?.setAttribute('stroke', liked ? '#ef4444' : 'currentColor')
+        likeBtn?.classList.toggle('text-red-500', liked)
     }
+    paint()
 
     likeBtn?.addEventListener('click', (e) => {
         e.stopPropagation()
         liked = !liked
         count += liked ? 1 : -1
-        if (likesEl) likesEl.textContent = count
-        heart?.setAttribute('fill', liked ? '#ef4444' : 'none')
-        heart?.setAttribute('stroke', liked ? '#ef4444' : 'currentColor')
-        likeBtn.classList.toggle('text-red-500', liked)
+        paint()
         fetch(`${API}/api/posts/${post.id}/like`, {
             method: liked ? 'POST' : 'DELETE',
             credentials: 'include'
+        }).catch(() => {
+            liked = !liked
+            count += liked ? 1 : -1
+            paint()
         })
     })
 
@@ -72,30 +75,6 @@ function updateHeaderAuth() {
     const createBtn = document.getElementById('createPostBtn')
     if (createBtn) createBtn.style.display = 'inline-flex'
 }
-
-function initMenuBurger() {
-    const menu = document.getElementById('menu-burger')
-    const btn = document.querySelector('[data-burger]')
-    if (!menu || !btn) return
-
-    btn.addEventListener('click', (e) => {
-        e.stopPropagation()
-        menu.classList.toggle('hidden')
-    })
-
-    document.addEventListener('click', (e) => {
-        if (!menu.contains(e.target)) menu.classList.add('hidden')
-    })
-
-    const logoutBtn = document.getElementById('menu-logout-btn')
-    if (logoutBtn) {
-        logoutBtn.addEventListener('click', () => {
-            fetch(`${API}/api/auth/logout`, { method: 'POST', credentials: 'include' })
-                .finally(() => { window.location.href = '/login' })
-        })
-    }
-}
-
 
 function openEditProfileModal(profile = {}) {
     const modal = document.getElementById('modal-edit-profile')
@@ -148,7 +127,6 @@ function initContactsModal() {
 
     document.querySelector('[data-open-contacts]')?.addEventListener('click', (e) => {
         e.preventDefault()
-        document.getElementById('menu-burger').classList.add('hidden')
         loadContacts()
         modal.classList.remove('hidden')
     })
@@ -213,35 +191,26 @@ function initFilterModal() {
     })
 }
 
-// --- Dark / Light mode ---
 function initTheme() {
-    const isDark = localStorage.getItem('theme') === 'dark'
-    if (isDark) applyDark()
+    if (localStorage.getItem('theme') === 'dark') applyDark()
 
     document.getElementById('theme-toggle')?.addEventListener('click', () => {
-        const dark = document.documentElement.classList.contains('dark')
-        dark ? applyLight() : applyDark()
+        document.documentElement.classList.contains('dark') ? applyLight() : applyDark()
     })
 }
 
 function applyDark() {
     document.documentElement.classList.add('dark')
     localStorage.setItem('theme', 'dark')
-    document.getElementById('theme-label').textContent = 'LIGHT MODE'
     document.getElementById('theme-icon-moon')?.classList.add('hidden')
     document.getElementById('theme-icon-sun')?.classList.remove('hidden')
-    document.getElementById('theme-pill')?.classList.replace('bg-gray-200', 'bg-black')
-    document.getElementById('theme-dot')?.classList.add('translate-x-5')
 }
 
 function applyLight() {
     document.documentElement.classList.remove('dark')
     localStorage.setItem('theme', 'light')
-    document.getElementById('theme-label').textContent = 'DARK MODE'
     document.getElementById('theme-icon-moon')?.classList.remove('hidden')
     document.getElementById('theme-icon-sun')?.classList.add('hidden')
-    document.getElementById('theme-pill')?.classList.replace('bg-black', 'bg-gray-200')
-    document.getElementById('theme-dot')?.classList.remove('translate-x-5')
 }
 
 // --- Création de post ---
@@ -361,7 +330,6 @@ function initCreatePost() {
 
 document.addEventListener('DOMContentLoaded', () => {
     initTheme()
-    initMenuBurger()
     initEditProfileModal()
     initContactsModal()
     initFilterModal()

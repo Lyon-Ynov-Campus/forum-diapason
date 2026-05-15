@@ -18,6 +18,15 @@ function createPostCard(post) {
     card.querySelector('.post-tags').textContent = (post.tags || []).map(t => `#${t}`).join(' ')
     card.querySelector('.post-likes').textContent = post.like_count
 
+    if (post.image_url) {
+        const img = document.createElement('img')
+        img.src = `http://localhost:8080${post.image_url}`
+        img.className = 'w-full object-cover max-h-48 mt-1'
+        img.alt = post.titre
+        const titleEl = card.querySelector('.post-title')
+        titleEl?.insertAdjacentElement('afterend', img)
+    }
+
     const article = card.querySelector('article')
     article.style.cursor = 'pointer'
     article.addEventListener('click', (e) => {
@@ -34,7 +43,7 @@ const profilePseudo = params.get('pseudo') || null
 
 const userId = profileId || 1
 
-fetch(`${API}/api/users/${userId}/posts`)
+fetch(`${API}/api/users/${userId}/posts`, { credentials: 'include' })
     .then(r => r.json())
     .then(posts => {
     const container = document.getElementById('profile-posts-container')

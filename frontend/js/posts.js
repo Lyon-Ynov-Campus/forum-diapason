@@ -48,7 +48,7 @@ function createTopPostCard(post) {
 }
 
 function loadPosts() {
-    fetch(`${API}/api/posts`)
+    fetch(`${API}/api/posts`, { credentials: 'include' })
         .then(r => r.json())
         .then(posts => {
             if (!Array.isArray(posts)) return
@@ -56,7 +56,7 @@ function loadPosts() {
             posts.forEach(post => container?.appendChild(createPostCard(post)))
         })
 
-    fetch(`${API}/api/posts/top?limit=6`)
+    fetch(`${API}/api/posts/top?limit=6`, { credentials: 'include' })
         .then(r => r.json())
         .then(posts => {
             if (!Array.isArray(posts)) {
