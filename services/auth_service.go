@@ -151,3 +151,59 @@ func StartSessionCleanup(db *sql.DB, interval time.Duration) {
 		}
 	}()
 }
+
+func CreatePasswordReset(db *sql.DB, email string) (string, int, error) {
+	email = strings.ToLower(strings.TrimSpace(email))
+	var userID int
+	if err := db.QueryRow(`SELECT id FROM users WHERE email = ?`, email).Scan(&userID); err != nil {
+		return "", 0, errors.New("email inconnu")
+	}
+	token, err := utils.GenerateSessionID()
+	if err != nil {
+		return "", 0, err
+	}
+	expires := time.Now().Add(1 * time.Hour)
+	_, err = db.Exec(
+		`INSERT INTO password_resets (token, user_id, expires_at) VALUES (?, ?, ?)`,
+		token, userID, expires,
+	)
+	if err != nil {
+		return "", 0, err
+	}
+	return token, userID, nil
+}
+
+func ResetPasswordWithToken(db *sql.DB, token, newPassword string) error {
+	if len(newPassword) < 8 {
+		return errors.New("mot de passe trop court (8 caractères min)")
+	}
+	var userID int
+	var used int
+	err := db.QueryRow(
+		`SELECT user_id, used FROM password_resets WHERE token = ? AND expires_at > datetime('now')`,
+		token,
+	).Scan(&userID, &used)
+	if err != nil {
+		return errors.New("token invalide ou expiré")
+	}
+	if used == 1 {
+		return errors.New("token déjà utilisé")
+	}
+	hash, err := bcrypt.GenerateFromPassword([]byte(newPassword), bcrypt.DefaultCost)
+	if err != nil {
+		return err
+	}
+	tx, err := db.Begin()
+	if err != nil {
+		return err
+	}
+	if _, err := tx.Exec(`UPDATE users SET password = ? WHERE id = ?`, string(hash), userID); err != nil {
+		tx.Rollback()
+		return err
+	}
+	if _, err := tx.Exec(`UPDATE password_resets SET used = 1 WHERE token = ?`, token); err != nil {
+		tx.Rollback()
+		return err
+	}
+	return tx.Commit()
+}

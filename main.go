@@ -42,6 +42,12 @@ func main() {
 	})
 	http.HandleFunc("/login", handlers.LoginPage)
 	http.HandleFunc("/register", handlers.RegisterPage)
+	http.HandleFunc("/forgot-password", func(w http.ResponseWriter, r *http.Request) {
+		handlers.RenderPage(w, r, "forgot-password", nil)
+	})
+	http.HandleFunc("/reset-password", func(w http.ResponseWriter, r *http.Request) {
+		handlers.RenderPage(w, r, "reset-password", nil)
+	})
 	http.HandleFunc("/logout", handlers.LogoutPage)
 	http.HandleFunc("/profile", handlers.ProfilePage)
 	http.HandleFunc("/profile/edit", handlers.ProfileEditPage)
