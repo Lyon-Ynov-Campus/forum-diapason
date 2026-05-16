@@ -1,5 +1,7 @@
 
-const API = 'http://localhost:8081'
+const API = window.location.hostname === 'localhost'
+    ? 'http://localhost:8081'
+    : `${window.location.protocol}//forum-diapason-api.francecentral.azurecontainer.io:8081`
 const MAX_IMAGE_SIZE = 2 * 1024 * 1024
 
 function openCropModal(file) {
