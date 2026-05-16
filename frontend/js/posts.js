@@ -46,6 +46,18 @@ function createTopPostCard(post) {
     tpl.querySelector('.top-post-author').textContent = post.author_pseudo
     tpl.querySelector('.top-post-content').textContent = post.contenu
     tpl.querySelector('.top-post-date').textContent = timeAgo(post.date_publication)
+
+    // Avatar
+    const photoImg = tpl.querySelector('.top-post-author-photo')
+    const photoDefault = tpl.querySelector('.top-post-author-avatar-default')
+    if (post.author_photo && post.author_photo !== '' && photoImg) {
+        photoImg.src = post.author_photo.startsWith('http')
+            ? post.author_photo
+            : `http://localhost:8080${post.author_photo}`
+        photoImg.classList.remove('hidden')
+        if (photoDefault) photoDefault.classList.add('hidden')
+    }
+
     const article = tpl.querySelector('article')
     article.style.cursor = 'pointer'
     article.addEventListener('click', () => {
