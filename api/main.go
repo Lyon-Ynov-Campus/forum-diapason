@@ -27,6 +27,8 @@ func main() {
 	mux.HandleFunc("/api/auth/login", authLogin)
 	mux.HandleFunc("/api/auth/logout", authLogout)
 	mux.HandleFunc("/api/auth/me", authMe)
+	mux.HandleFunc("/api/auth/forgot-password", authForgotPassword)
+	mux.HandleFunc("/api/auth/reset-password",  authResetPassword)
 
 	// Profil
 	mux.HandleFunc("/api/profile", profileUpdate)

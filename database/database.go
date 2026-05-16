@@ -105,8 +105,16 @@ func runMigrations(db *sql.DB) {
 		expires_at DATETIME NOT NULL,
 		used       INTEGER  NOT NULL DEFAULT 0 
 		)`,
-		`CREATE INDEX IF NOT EXISTS idx_magic_tokens_email ON magic_tokens(email)`, 
+		`CREATE INDEX IF NOT EXISTS idx_magic_tokens_email ON magic_tokens(email)`,
 		*/
+
+		`CREATE TABLE IF NOT EXISTS password_resets (
+			token      TEXT     PRIMARY KEY,
+			user_id    INTEGER  NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+			expires_at DATETIME NOT NULL,
+			used       INTEGER  NOT NULL DEFAULT 0
+		)`,
+		`CREATE INDEX IF NOT EXISTS idx_password_resets_user_id ON password_resets(user_id)`,
 	}
 
 	for _, q := range queries {
