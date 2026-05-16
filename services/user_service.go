@@ -259,3 +259,31 @@ func UploadPostImage(db *sql.DB, postID int, file multipart.File, header *multip
 	_, err = db.Exec(`UPDATE posts SET image_url = ? WHERE id = ?`, webPath, postID)
 	return webPath, err
 }
+
+func SearchUsers(db *sql.DB, q string, limit int) ([]*models.User, error) {
+	q = strings.TrimSpace(q)
+	if q == "" {
+		return nil, nil
+	}
+	like := "%" + strings.ToLower(q) + "%"
+	rows, err := db.Query(
+		`SELECT id, nom, pseudo, email, photo_url, created_at
+		 FROM users
+		 WHERE LOWER(pseudo) LIKE ? OR LOWER(nom) LIKE ?
+		 ORDER BY pseudo ASC
+		 LIMIT ?`, like, like, limit,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var users []*models.User
+	for rows.Next() {
+		u := &models.User{}
+		if err := rows.Scan(&u.ID, &u.Nom, &u.Pseudo, &u.Email, &u.PhotoURL, &u.CreatedAt); err != nil {
+			continue
+		}
+		users = append(users, u)
+	}
+	return users, nil
+}

@@ -240,6 +240,12 @@
   .top-4 {
     top: calc(var(--spacing) * 4);
   }
+  .top-full {
+    top: 100%;
+  }
+  .right-0 {
+    right: calc(var(--spacing) * 0);
+  }
   .right-3 {
     right: calc(var(--spacing) * 3);
   }
@@ -252,11 +258,17 @@
   .bottom-6 {
     bottom: calc(var(--spacing) * 6);
   }
+  .left-0 {
+    left: calc(var(--spacing) * 0);
+  }
   .left-1\/2 {
     left: calc(1 / 2 * 100%);
   }
   .left-8 {
     left: calc(var(--spacing) * 8);
+  }
+  .z-40 {
+    z-index: 40;
   }
   .z-50 {
     z-index: 50;
@@ -393,8 +405,8 @@
   .h-full {
     height: 100%;
   }
-  .max-h-64 {
-    max-height: calc(var(--spacing) * 64);
+  .max-h-80 {
+    max-height: calc(var(--spacing) * 80);
   }
   .max-h-96 {
     max-height: calc(var(--spacing) * 96);
@@ -462,8 +474,8 @@
   .w-\[480px\] {
     width: 480px;
   }
-  .w-\[520px\] {
-    width: 520px;
+  .w-\[500px\] {
+    width: 500px;
   }
   .w-full {
     width: 100%;
@@ -634,6 +646,9 @@
   }
   .border-blue-400 {
     border-color: var(--color-blue-400);
+  }
+  .border-gray-100 {
+    border-color: var(--color-gray-100);
   }
   .border-gray-200 {
     border-color: var(--color-gray-200);
@@ -871,6 +886,10 @@
     --tw-shadow: 0 0 0 9999px var(--tw-shadow-color, rgba(0,0,0,0.4));
     box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
   }
+  .shadow-lg {
+    --tw-shadow: 0 10px 15px -3px var(--tw-shadow-color, rgb(0 0 0 / 0.1)), 0 4px 6px -4px var(--tw-shadow-color, rgb(0 0 0 / 0.1));
+    box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
+  }
   .transition-colors {
     transition-property: color, background-color, border-color, outline-color, text-decoration-color, fill, stroke, --tw-gradient-from, --tw-gradient-via, --tw-gradient-to;
     transition-timing-function: var(--tw-ease, var(--default-transition-timing-function));
@@ -1088,8 +1107,21 @@
 .dark .hover\:bg-gray-50:hover {
   background-color: #222;
 }
+.dark .hover\:bg-gray-100:hover {
+  background-color: #2a2a2a;
+}
 .dark .hover\:bg-gray-800:hover {
   background-color: #2a2a2a;
+}
+.dark #search-suggestions {
+  background-color: #1a1a1a;
+  border-color: #333;
+}
+.dark #search-suggestions a {
+  border-color: #333;
+}
+.dark #search-suggestions .bg-gray-200 {
+  background-color: #333;
 }
 @property --tw-translate-x {
   syntax: "*";

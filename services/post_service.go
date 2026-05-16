@@ -382,9 +382,13 @@ func SearchPosts(db *sql.DB, currentUserID int, q, sort string, tags []string, l
 	args := []any{currentUserID}
 
 	if strings.TrimSpace(q) != "" {
-		where = append(where, "(LOWER(p.titre) LIKE ? OR LOWER(p.contenu) LIKE ?)")
 		like := "%" + strings.ToLower(strings.TrimSpace(q)) + "%"
-		args = append(args, like, like)
+		where = append(where, `(
+			LOWER(p.titre)   LIKE ? OR
+			LOWER(p.contenu) LIKE ? OR
+			p.id IN (SELECT pt.post_id FROM post_tags pt JOIN tags t ON t.id = pt.tag_id WHERE LOWER(t.nom) LIKE ?)
+		)`)
+		args = append(args, like, like, like)
 	}
 
 	if len(tags) > 0 {

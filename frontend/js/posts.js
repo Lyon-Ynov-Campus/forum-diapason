@@ -37,25 +37,6 @@ function createPostCard(post) {
     return card
 }
 
-function createUserCard(user) {
-    const div = document.createElement('div')
-    div.className = 'border border-gray-200 p-4 hover:bg-gray-50 cursor-pointer transition'
-    div.style.cursor = 'pointer'
-    div.innerHTML = `
-        <div class="flex items-center gap-3">
-            <img src="${user.photo_url || 'https://via.placeholder.com/40'}" alt="${user.pseudo}" class="w-10 h-10 rounded-full object-cover">
-            <div>
-                <p class="font-bold text-sm">${user.pseudo}</p>
-                <p class="text-xs text-gray-500">👤 Utilisateur</p>
-            </div>
-        </div>
-    `
-    div.addEventListener('click', () => {
-        window.location.href = `/profile?id=${user.id}`
-    })
-    return div
-}
-
 function createTopPostCard(post) {
     const card = document.getElementById('top-post-card').content.cloneNode(true)
     const a = card.querySelector('.top-post-author')
@@ -72,12 +53,6 @@ function loadPosts() {
     const container = document.getElementById('posts-container')
     if (container) container.innerHTML = ''
 
-    // Si y a une recherche textuelle ET pas de tags/tri -> utiliser l'API de recherche globale
-    if (postsFilter.q && !postsFilter.sort && postsFilter.tags.length === 0) {
-        return loadSearchResults()
-    }
-
-    // Sinon utiliser l'API posts avec filtres
     const params = new URLSearchParams()
     if (postsFilter.q)          params.set('q', postsFilter.q)
     if (postsFilter.sort)       params.set('sort', postsFilter.sort)
@@ -111,35 +86,6 @@ function loadPosts() {
         })
 }
 
-function loadSearchResults() {
-    const container = document.getElementById('posts-container')
-    const url = `${API}/api/search?q=${encodeURIComponent(postsFilter.q)}`
-    console.log('loadSearchResults - URL:', url)
-
-    fetch(url, { credentials: 'include' })
-        .then(r => r.json())
-        .then(results => {
-            console.log('loadSearchResults - Résultats:', results)
-            if (!Array.isArray(results)) return
-            
-            if (results.length === 0 && container) {
-                container.innerHTML = '<p class="text-sm text-gray-400 text-center py-8">Aucun résultat trouvé pour "<strong>' + postsFilter.q + '</strong>"</p>'
-                return
-            }
-            
-            results.forEach(result => {
-                if (result.type === 'user' && result.user) {
-                    container?.appendChild(createUserCard(result.user))
-                } else if (result.type === 'post' && result.post) {
-                    container?.appendChild(createPostCard(result.post))
-                }
-            })
-        })
-        .catch(err => {
-            console.error('loadSearchResults - Erreur fetch:', err)
-        })
-}
-
 function loadTopPosts() {
     const topContainer = document.getElementById('top-posts-container')
     if (topContainer) topContainer.innerHTML = ''
@@ -154,16 +100,56 @@ function loadTopPosts() {
 
 function reloadPosts() { loadPosts(); loadTopPosts() }
 
+function renderUserSuggestions(users) {
+    const box = document.getElementById('search-suggestions')
+    if (!box) return
+    if (!users || users.length === 0) { box.classList.add('hidden'); return }
+    box.innerHTML = users.map(u => `
+        <a href="/profile?id=${u.id}" class="flex items-center gap-3 px-4 py-2 hover:bg-gray-100 border-b border-gray-100 last:border-0">
+            <div class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 shrink-0 overflow-hidden">
+                ${u.photo_url
+                    ? `<img src="http://localhost:8080${u.photo_url}" class="w-full h-full object-cover">`
+                    : `<svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>`
+                }
+            </div>
+            <div class="flex flex-col">
+                <span class="text-sm font-bold">${u.pseudo}</span>
+                <span class="text-xs text-gray-400">${u.nom || ''}</span>
+            </div>
+        </a>
+    `).join('')
+    box.classList.remove('hidden')
+}
+
+function searchUsers(q) {
+    if (!q) { renderUserSuggestions([]); return }
+    fetch(`${API}/api/search?q=${encodeURIComponent(q)}&limit=10`, { credentials: 'include' })
+        .then(r => r.json())
+        .then(results => {
+            const users = (results || []).filter(r => r.type === 'user').map(r => r.user)
+            renderUserSuggestions(users)
+        })
+}
+
 function initSearch() {
     const input = document.getElementById('search-input')
+    const box   = document.getElementById('search-suggestions')
     if (!input) return
     let t
     input.addEventListener('input', () => {
         clearTimeout(t)
         t = setTimeout(() => {
-            postsFilter.q = input.value.trim()
+            const q = input.value.trim()
+            postsFilter.q = q
             loadPosts()
+            searchUsers(q)
         }, 300)
+    })
+    input.addEventListener('focus', () => {
+        if (input.value.trim()) searchUsers(input.value.trim())
+    })
+    document.addEventListener('click', (e) => {
+        if (box && !box.contains(e.target) && e.target !== input) box.classList.add('hidden')
     })
 }
 
