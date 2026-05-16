@@ -10,6 +10,7 @@ services:
       PORT: "8080"
       DB_FILE: "/app/data/forum.db"
       COOKIE_SECURE: "false"
+      COOKIE_DOMAIN: "${COOKIE_DOMAIN:-}"
     volumes:
       - data:/app/data
       - uploads_avatars:/app/public/avatars

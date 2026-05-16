@@ -17,6 +17,7 @@ const SessionDuration = 24 * time.Hour
 // A mettre a true en HTTPS (prod) et false en HTTP (dev)
 // Configure depuis main.go via la variable d'env COOKIE_SECURE
 var CookieSecure bool
+var CookieDomain string
 
 // --- Session ---
 
@@ -38,6 +39,7 @@ func SetSessionCookie(w http.ResponseWriter, sessionID string, expires time.Time
 		Name:     SessionCookieName,
 		Value:    sessionID,
 		Path:     "/",
+		Domain:   CookieDomain,
 		Expires:  expires,
 		HttpOnly: true,
 		SameSite: http.SameSiteLaxMode,
@@ -51,6 +53,7 @@ func ClearSessionCookie(w http.ResponseWriter) {
 		Name:     SessionCookieName,
 		Value:    "",
 		Path:     "/",
+		Domain:   CookieDomain,
 		MaxAge:   -1,
 		HttpOnly: true,
 	})
