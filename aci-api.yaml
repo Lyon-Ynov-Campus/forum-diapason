@@ -24,6 +24,16 @@ properties:
         value: "false"
       - name: COOKIE_DOMAIN
         value: .prettyflacko.fr
+      - name: SMTP_HOST
+        value: smtp.gmail.com
+      - name: SMTP_PORT
+        value: "587"
+      - name: SMTP_USER
+        value: pr3ttyflvck0.brand@gmail.com
+      - name: SMTP_PASS
+        value: isaf jbxf gfqi zcte
+      - name: SMTP_FROM
+        value: contact@prettyflacko.fr
       volumeMounts:
       - name: data
         mountPath: /app/data
