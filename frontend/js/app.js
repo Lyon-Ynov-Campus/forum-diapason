@@ -1,5 +1,7 @@
 
-const API = 'http://localhost:8081'
+const API = window.location.hostname === 'localhost'
+    ? 'http://localhost:8081'
+    : 'https://api.prettyflacko.fr'
 const MAX_IMAGE_SIZE = 2 * 1024 * 1024
 
 function openCropModal(file) {
@@ -522,7 +524,40 @@ document.addEventListener('DOMContentLoaded', () => {
     initCreatePost()
     checkAuth()
     initPasswordToggle()
+    initSettingsModal()
+    showDeleteAccountError()
 })
+
+function initSettingsModal() {
+    const modal = document.getElementById('modal-settings')
+    if (!modal) return
+
+    const close = () => modal.classList.add('hidden')
+
+    document.getElementById('modal-settings-close')?.addEventListener('click', close)
+    modal.addEventListener('click', (e) => { if (e.target === modal) close() })
+
+    document.querySelector('[data-open-settings]')?.addEventListener('click', (e) => {
+        e.preventDefault()
+        modal.classList.remove('hidden')
+    })
+
+    document.getElementById('settings-delete-form')?.addEventListener('submit', (e) => {
+        if (!confirm('Supprimer définitivement ton compte ? Cette action est irréversible.')) {
+            e.preventDefault()
+        }
+    })
+}
+
+function showDeleteAccountError() {
+    const params = new URLSearchParams(window.location.search)
+    const err = params.get('delete_error')
+    if (!err) return
+    showToast('Erreur : ' + decodeURIComponent(err))
+    params.delete('delete_error')
+    const clean = window.location.pathname + (params.toString() ? '?' + params.toString() : '')
+    window.history.replaceState({}, '', clean)
+}
 
 function initPasswordToggle() {
     const toggleButtons = document.querySelectorAll('.toggle-password')

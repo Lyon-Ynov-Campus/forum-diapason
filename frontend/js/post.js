@@ -103,7 +103,7 @@ function render(post) {
     const imageContainer = document.getElementById('post-image-container')
     if (post.image_url && imageContainer) {
         const img = document.createElement('img')
-        img.src = `http://localhost:8080${post.image_url}`
+        img.src = `${window.location.origin}${post.image_url}`
         img.className = 'max-w-full max-h-[500px] object-contain object-left'
         img.alt = post.titre
         imageContainer.innerHTML = ''

@@ -312,3 +312,23 @@ func SearchUsers(db *sql.DB, q string, limit int) ([]*models.User, error) {
 	}
 	return users, nil
 }
+
+func DeleteUser(db *sql.DB, userID int, password string) error {
+	var currentHash string
+	err := db.QueryRow(`SELECT password FROM users WHERE id = ?`, userID).Scan(&currentHash)
+	if err != nil {
+		return errors.New("utilisateur introuvable")
+	}
+	if err := bcrypt.CompareHashAndPassword([]byte(currentHash), []byte(password)); err != nil {
+		return errors.New("mot de passe incorrect")
+	}
+
+	for _, ext := range []string{".png", ".jpg", ".jpeg", ".webp", ".gif"} {
+		os.Remove(filepath.Join(AvatarDir, fmt.Sprintf("%d%s", userID, ext)))
+	}
+
+	if _, err := db.Exec(`DELETE FROM users WHERE id = ?`, userID); err != nil {
+		return errors.New("erreur lors de la suppression du compte")
+	}
+	return nil
+}

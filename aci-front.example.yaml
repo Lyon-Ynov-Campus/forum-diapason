@@ -1,0 +1,54 @@
+apiVersion: '2021-10-01'
+location: francecentral
+name: forum-front
+properties:
+  containers:
+  - name: forum-front
+    properties:
+      image: forumdiapason.azurecr.io/forum-front:latest
+      ports:
+      - port: 8080
+        protocol: TCP
+      resources:
+        requests:
+          cpu: 1.0
+          memoryInGB: 1.0
+      environmentVariables:
+      - name: PORT
+        value: "8080"
+      - name: DB_FILE
+        value: /app/data/forum.db
+      - name: COOKIE_SECURE
+        value: "false"
+      - name: COOKIE_DOMAIN
+        value: .prettyflacko.fr
+      volumeMounts:
+      - name: data
+        mountPath: /app/data
+      - name: public
+        mountPath: /app/public
+  osType: Linux
+  restartPolicy: Always
+  ipAddress:
+    type: Public
+    ports:
+    - protocol: TCP
+      port: 8080
+    dnsNameLabel: forum-diapason
+  imageRegistryCredentials:
+  - server: forumdiapason.azurecr.io
+    username: PLACEHOLDER_ACR_USER
+    password: PLACEHOLDER_ACR_PASS
+  volumes:
+  - name: data
+    azureFile:
+      shareName: forumdata
+      storageAccountName: forumdiapasonstorage
+      storageAccountKey: PLACEHOLDER_STORAGE_KEY
+  - name: public
+    azureFile:
+      shareName: forumpublic
+      storageAccountName: forumdiapasonstorage
+      storageAccountKey: PLACEHOLDER_STORAGE_KEY
+tags: {}
+type: Microsoft.ContainerInstance/containerGroups

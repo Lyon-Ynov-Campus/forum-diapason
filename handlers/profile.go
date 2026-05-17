@@ -205,3 +205,24 @@ func rerenderAvatarErr(w http.ResponseWriter, r *http.Request, user *models.User
 		"AvatarError": msg,
 	})
 }
+
+func ProfileDeletePage(w http.ResponseWriter, r *http.Request) {
+	user := currentUser(r)
+	if user == nil {
+		http.Redirect(w, r, "/login", http.StatusSeeOther)
+		return
+	}
+	if r.Method != http.MethodPost {
+		http.Error(w, "méthode non autorisée", http.StatusMethodNotAllowed)
+		return
+	}
+
+	password := r.FormValue("password")
+	if err := services.DeleteUser(db, user.ID, password); err != nil {
+		http.Redirect(w, r, "/profile?delete_error="+url.QueryEscape(err.Error()), http.StatusSeeOther)
+		return
+	}
+
+	services.Logout(db, w, r)
+	http.Redirect(w, r, "/", http.StatusSeeOther)
+}

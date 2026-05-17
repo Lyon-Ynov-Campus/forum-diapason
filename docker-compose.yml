@@ -1,0 +1,47 @@
+services:
+  front:
+    build:
+      context: .
+      dockerfile: Dockerfile.front
+    image: forum-front:latest
+    ports:
+      - "8080:8080"
+    environment:
+      PORT: "8080"
+      DB_FILE: "/app/data/forum.db"
+      COOKIE_SECURE: "${COOKIE_SECURE:-false}"
+      COOKIE_DOMAIN: "${COOKIE_DOMAIN:-}"
+    volumes:
+      - data:/app/data
+      - uploads_avatars:/app/public/avatars
+      - uploads_posts:/app/public/posts
+    restart: unless-stopped
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    image: forum-api:latest
+    ports:
+      - "8081:8081"
+    environment:
+      API_PORT: "8081"
+      DB_FILE: "/app/data/forum.db"
+      FRONTEND_ORIGIN: "${FRONTEND_ORIGIN:-http://localhost:8080}"
+      COOKIE_SECURE: "${COOKIE_SECURE:-false}"
+      COOKIE_DOMAIN: "${COOKIE_DOMAIN:-}"
+      SMTP_HOST: "${SMTP_HOST:-}"
+      SMTP_PORT: "${SMTP_PORT:-}"
+      SMTP_USER: "${SMTP_USER:-}"
+      SMTP_PASS: "${SMTP_PASS:-}"
+      SMTP_FROM: "${SMTP_FROM:-}"
+    volumes:
+      - data:/app/data
+      - uploads_avatars:/app/public/avatars
+      - uploads_posts:/app/public/posts
+    restart: unless-stopped
+
+volumes:
+  data:
+  uploads_avatars:
+  uploads_posts:

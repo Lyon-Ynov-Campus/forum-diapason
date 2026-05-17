@@ -7,6 +7,7 @@ import (
 
 	"forum-diapason/database"
 	"forum-diapason/handlers"
+	"forum-diapason/utils"
 )
 
 var db *sql.DB
@@ -14,6 +15,8 @@ var db *sql.DB
 func main() {
 	port := getEnv("API_PORT", "8081")
 	dbFile := getEnv("DB_FILE", "./forum.db")
+	utils.CookieSecure = getEnv("COOKIE_SECURE", "false") == "true"
+	utils.CookieDomain = getEnv("COOKIE_DOMAIN", "")
 
 	db = database.Init(dbFile)
 	defer db.Close()

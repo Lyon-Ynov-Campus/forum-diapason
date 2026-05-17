@@ -20,7 +20,7 @@ function createPostCard(post) {
 
     if (post.image_url) {
         const img = document.createElement('img')
-        img.src = `http://localhost:8080${post.image_url}`
+        img.src = `${window.location.origin}${post.image_url}`
         img.className = 'max-w-full max-h-96 object-contain object-left mt-1'
         img.alt = post.titre
         const titleEl = card.querySelector('.post-title')
