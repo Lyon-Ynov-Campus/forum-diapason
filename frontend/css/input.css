@@ -56,7 +56,6 @@ summary { list-style: none; }
 .dark textarea::placeholder { color: #666; }
 .dark article       { background-color: #1a1a1a; border-color: #333; }
 .dark aside         { background-color: #1a1a1a; border-color: #333; }
-.dark #menu-burger  { background-color: #1a1a1a; border-color: #333; }
 .dark [id^="modal-"] > div { background-color: #1a1a1a; }
 .dark .divide-gray-100 > * { border-color: #333; }
 .dark .border-gray-200 { border-color: #333; }

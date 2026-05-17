@@ -492,7 +492,6 @@ function initSettingsModal() {
 
     document.querySelector('[data-open-settings]')?.addEventListener('click', (e) => {
         e.preventDefault()
-        document.getElementById('menu-burger')?.classList.add('hidden')
         modal.classList.remove('hidden')
     })
 
