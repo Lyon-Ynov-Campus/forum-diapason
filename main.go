@@ -55,6 +55,7 @@ func main() {
 	http.HandleFunc("/profile/avatar", handlers.ProfileAvatarPage)
 	http.HandleFunc("/profile/avatar/delete", handlers.ProfileAvatarDeletePage)
 	http.HandleFunc("/profile/password", handlers.ProfilePasswordPage)
+	http.HandleFunc("/profile/delete", handlers.ProfileDeletePage)
 	http.HandleFunc("/post", func(w http.ResponseWriter, r *http.Request) {
 		handlers.RenderPage(w, r, "post", nil)
 	})

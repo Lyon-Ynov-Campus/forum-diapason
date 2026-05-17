@@ -1,0 +1,66 @@
+{{define "modal-settings"}}
+<div id="modal-settings" class="hidden fixed inset-0 bg-black/40 z-50 flex items-center justify-center">
+
+    <div class="settings-modal-container bg-white flex flex-col border border-gray-200 shadow-sm">
+
+        <div class="flex items-center justify-between px-6 py-4 border-b border-gray-200 shrink-0">
+            <h2 class="font-black text-base tracking-wider">PARAMÈTRES</h2>
+            <button id="modal-settings-close" class="text-gray-400 hover:text-black text-2xl leading-none">×</button>
+        </div>
+
+        <div class="flex-1 overflow-y-auto divide-y divide-gray-100">
+
+            <!-- Section : COMPTE -->
+            <details class="settings-section group" open>
+                <summary class="flex items-center justify-between px-6 py-4 cursor-pointer hover:bg-gray-50 select-none list-none">
+                    <h3 class="text-xs font-bold tracking-widest text-gray-700">COMPTE</h3>
+                    <svg class="h-4 w-4 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                    </svg>
+                </summary>
+
+                <div class="divide-y divide-gray-100 border-t border-gray-100 bg-gray-50/40">
+
+                    <!-- Profil -->
+                    <a href="/profile/edit" class="px-6 py-4 flex items-center justify-between gap-4 hover:bg-gray-100">
+                        <div class="min-w-0">
+                            <p class="text-sm font-bold">Modifier mon compte</p>
+                            <p class="text-xs text-gray-500 mt-0.5">Pseudo, e-mail, photo, mot de passe.</p>
+                        </div>
+                        <span class="shrink-0 px-4 py-2 border border-gray-300 bg-white text-sm">Modifier</span>
+                    </a>
+
+                </div>
+            </details>
+
+            <!-- Section : ZONE DE DANGER -->
+            <details class="settings-section group">
+                <summary class="danger-summary flex items-center justify-between px-6 py-4 cursor-pointer select-none list-none">
+                    <h3 class="danger-title text-xs font-bold tracking-widest">ZONE DE DANGER</h3>
+                    <svg class="danger-chevron h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                    </svg>
+                </summary>
+
+                <div class="danger-content">
+
+                    <!-- Delete account -->
+                    <form id="settings-delete-form" method="POST" action="/profile/delete" class="px-6 py-4 flex flex-col gap-3">
+                        <div>
+                            <p class="danger-label text-sm font-bold">Supprimer mon compte</p>
+                            <p class="danger-help text-xs mt-0.5">Action irréversible. Posts, commentaires et données seront effacés.</p>
+                        </div>
+                        <input type="password" name="password" placeholder="Confirme avec ton mot de passe"
+                            required minlength="8"
+                            class="danger-input w-full px-3 py-2 text-sm">
+                        <button type="submit" class="danger-submit shrink-0 self-end px-4 py-2 text-sm font-bold">Supprimer définitivement</button>
+                    </form>
+
+                </div>
+            </details>
+
+        </div>
+
+    </div>
+</div>
+{{end}}
