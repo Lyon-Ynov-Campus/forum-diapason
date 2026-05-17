@@ -206,6 +206,31 @@ func resizeToSquare(src image.Image, size int) image.Image {
 	return out
 }
 
+// DeleteUser supprime le compte apres verification du mdp
+// Les FK en ON DELETE CASCADE (sessions, posts, comments, likes, follows,
+// post_tags via posts) s'occupent du nettoyage en base
+// Seul reste a la main : les fichiers avatars sur disque
+func DeleteUser(db *sql.DB, userID int, password string) error {
+	var currentHash string
+	err := db.QueryRow(`SELECT password FROM users WHERE id = ?`, userID).Scan(&currentHash)
+	if err != nil {
+		return errors.New("utilisateur introuvable")
+	}
+	if err := bcrypt.CompareHashAndPassword([]byte(currentHash), []byte(password)); err != nil {
+		return errors.New("mot de passe incorrect")
+	}
+
+	for _, ext := range []string{".png", ".jpg", ".jpeg", ".webp", ".gif"} {
+		os.Remove(filepath.Join(AvatarDir, fmt.Sprintf("%d%s", userID, ext)))
+	}
+
+	if _, err := db.Exec(`DELETE FROM users WHERE id = ?`, userID); err != nil {
+		return errors.New("erreur lors de la suppression du compte")
+	}
+	return nil
+}
+
+// GetUserByID retourne un utilisateur par son ID (sans le mot de passe)
 func GetUserByID(db *sql.DB, userID int) (*models.User, error) {
 	user := &models.User{}
 	err := db.QueryRow(
