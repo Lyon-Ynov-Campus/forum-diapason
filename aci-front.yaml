@@ -37,18 +37,18 @@ properties:
     dnsNameLabel: forum-diapason
   imageRegistryCredentials:
   - server: forumdiapason.azurecr.io
-    username: PLACEHOLDER_ACR_USER
-    password: PLACEHOLDER_ACR_PASS
+    username: forumdiapason
+    password: A2NvAxznIBtYKGnux7SiEbRuzAXhhAKT5bPFwLdRYSSsaBVyluKiJQQJ99CEAC5T7U2Eqg7NAAACAZCRDBQ4
   volumes:
   - name: data
     azureFile:
       shareName: forumdata
       storageAccountName: forumdiapasonstorage
-      storageAccountKey: PLACEHOLDER_STORAGE_KEY
+      storageAccountKey: jshmfKyZVjVyTU+Q67OX/Xz/pPPavVX/YU9JJdZSAyJ1ib3zexC+De3j3PNJLz0lSPrXc641ZyRq+AStATP4gA==
   - name: public
     azureFile:
       shareName: forumpublic
       storageAccountName: forumdiapasonstorage
-      storageAccountKey: PLACEHOLDER_STORAGE_KEY
+      storageAccountKey: jshmfKyZVjVyTU+Q67OX/Xz/pPPavVX/YU9JJdZSAyJ1ib3zexC+De3j3PNJLz0lSPrXc641ZyRq+AStATP4gA==
 tags: {}
 type: Microsoft.ContainerInstance/containerGroups
