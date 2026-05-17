@@ -20,7 +20,7 @@ function createPostCard(post) {
 
     if (post.image_url) {
         const img = document.createElement('img')
-        img.src = `http://localhost:8080${post.image_url}`
+        img.src = `${window.location.origin}${post.image_url}`
         img.className = 'max-w-full max-h-96 object-contain object-left mt-1'
         img.alt = post.titre
         const titleEl = card.querySelector('.post-title')
@@ -108,7 +108,7 @@ function renderUserSuggestions(users) {
         <a href="/profile?id=${u.id}" class="flex items-center gap-3 px-4 py-2 hover:bg-gray-100 border-b border-gray-100 last:border-0">
             <div class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 shrink-0 overflow-hidden">
                 ${u.photo_url
-                    ? `<img src="http://localhost:8080${u.photo_url}" class="w-full h-full object-cover">`
+                    ? `<img src="${window.location.origin}${u.photo_url}" class="w-full h-full object-cover">`
                     : `<svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>`
                 }
             </div>
