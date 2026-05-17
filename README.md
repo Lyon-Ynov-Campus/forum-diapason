@@ -1,10 +1,8 @@
-# Forum Diapason — Déploiement Azure
+# Forum Diapason
 
-Forum musical déployé sur Azure Container Instances avec Cloudflare.
+Forum musical permettant de partager des découvertes, des avis et des discussions autour de la musique.
 
-**URL de production** : https://forum.prettyflacko.fr
-
-> Pour le développement local, voir la branche `main`.
+> Pour le déploiement en production (Azure), voir la branche `azure-deploy`.
 
 ---
 
@@ -12,124 +10,154 @@ Forum musical déployé sur Azure Container Instances avec Cloudflare.
 
 - **Backend** : Go stdlib (`net/http`, `html/template`)
 - **Base de données** : SQLite via `go-sqlite3` (CGO)
-- **Frontend** : HTML, JavaScript vanilla, Tailwind CSS v4
+- **Frontend** : HTML, JavaScript vanilla, Tailwind CSS v4 (CLI standalone)
 - **Auth** : Sessions cookie (`SameSite=Lax`, `HttpOnly`)
 - **Email** : SMTP (reset de mot de passe)
-- **Déploiement** : Azure Container Instances + Azure File Share + Cloudflare
 
 ---
 
-## Architecture de déploiement
+## Fonctionnalités
 
-```
-Cloudflare (HTTPS + Origin Rules)
-       │
-       ├── forum.prettyflacko.fr → ACI forum-front :8080
-       └── api.prettyflacko.fr   → ACI forum-api   :8081
-                                          │
-                                 Azure File Share
-                                 ├── forumdata   → /app/data   (SQLite)
-                                 └── forumpublic → /app/public (uploads)
-```
-
-Les 2 containers partagent la même base SQLite via le File Share `forumdata`.
+- Inscription / connexion / déconnexion
+- Réinitialisation du mot de passe par email
+- Paramètres du compte (modification, suppression)
+- Posts avec titre, contenu, tags et image (recadrage + compression côté client)
+- Likes, commentaires et réponses aux commentaires
+- Page profil avec avatar, bio et liste des posts
+- Recherche fulltext (titre, contenu, tags) et filtres (tri, tags)
+- Suggestions d'utilisateurs dans la barre de recherche
+- Follows entre utilisateurs
+- Dark mode persistant
 
 ---
 
-## Prérequis Azure
+## Prérequis
 
-- Azure CLI (`az`)
-- Docker
-- Azure Container Registry : `forumdiapason.azurecr.io`
-- Azure Resource Group : `forum-diapason`
-- Azure Storage Account : `forumdiapasonstorage`
-  - File Share `forumdata` (base de données)
-  - File Share `forumpublic` (uploads avatars et images)
-
----
-
-## Build et push des images
+### Go 1.25+
 
 ```bash
-az acr login --name forumdiapason
+VERSION=$(curl -s "https://go.dev/VERSION?m=text" | head -1)
+curl -LO "https://go.dev/dl/${VERSION}.linux-amd64.tar.gz"
+sudo rm -rf /usr/local/go && sudo tar -C /usr/local -xzf ${VERSION}.linux-amd64.tar.gz
+rm ${VERSION}.linux-amd64.tar.gz
+```
 
-docker build --no-cache -f Dockerfile.front -t forumdiapason.azurecr.io/forum-front:latest .
-docker build --no-cache -f Dockerfile.api   -t forumdiapason.azurecr.io/forum-api:latest .
+Ajouter dans `~/.bashrc` :
+```bash
+export PATH=/usr/local/go/bin:$PATH
+```
 
-docker push forumdiapason.azurecr.io/forum-front:latest
-docker push forumdiapason.azurecr.io/forum-api:latest
+### GCC (requis par go-sqlite3)
+
+```bash
+sudo apt install gcc
+```
+
+### Air — live reload
+
+```bash
+go install github.com/air-verse/air@latest
+```
+
+Vérifier que `~/go/bin` est dans le PATH :
+```bash
+export PATH=$PATH:$(go env GOPATH)/bin
+```
+
+### Tailwind CSS CLI
+
+```bash
+curl -sLO https://github.com/tailwindlabs/tailwindcss/releases/latest/download/tailwindcss-linux-x64
+chmod +x tailwindcss-linux-x64 && mv tailwindcss-linux-x64 tailwindcss
 ```
 
 ---
 
-## Déploiement des containers
+## Configuration
 
-Partir des templates `aci-front.example.yaml` et `aci-api.example.yaml`, remplacer les `PLACEHOLDER_*` par les vraies valeurs (credentials ACR + clé Storage), puis :
-
+Copier `.env.example` en `.env` et remplir les valeurs :
 ```bash
-az container delete -g forum-diapason -n forum-front --yes
-az container delete -g forum-diapason -n forum-api --yes
-
-az container create -g forum-diapason --file aci-front.yaml
-az container create -g forum-diapason --file aci-api.yaml
+cp .env.example .env
 ```
 
----
+```env
+PORT=8080
+API_PORT=8081
+DB_FILE=./forum.db
+COOKIE_SECURE=false
+COOKIE_DOMAIN=
+FRONTEND_ORIGIN=http://localhost:8080
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_USER=
+SMTP_PASS=
+SMTP_FROM=
+```
 
-## Variables d'environnement
-
-### forum-front
-
-| Variable | Valeur prod |
-|----------|-------------|
-| `PORT` | `8080` |
-| `DB_FILE` | `/app/data/forum.db` |
-| `COOKIE_SECURE` | `false` |
-| `COOKIE_DOMAIN` | `.prettyflacko.fr` |
-
-### forum-api
-
-| Variable | Valeur prod |
-|----------|-------------|
-| `API_PORT` | `8081` |
-| `DB_FILE` | `/app/data/forum.db` |
-| `FRONTEND_ORIGIN` | `https://forum.prettyflacko.fr` |
-| `COOKIE_SECURE` | `false` |
-| `COOKIE_DOMAIN` | `.prettyflacko.fr` |
-| `SMTP_HOST` | `smtp.gmail.com` |
-| `SMTP_PORT` | `587` |
-| `SMTP_USER` | *(compte Gmail)* |
-| `SMTP_PASS` | *(app password 16 car)* |
-| `SMTP_FROM` | `contact@prettyflacko.fr` |
+> Sans SMTP configuré, les liens de reset password s'affichent dans les logs du serveur API.
 
 ---
 
-## Configuration Cloudflare
-
-**DNS** (proxied 🟠) :
-| Type | Name | Cible |
-|------|------|-------|
-| CNAME | `forum` | `forum-diapason.francecentral.azurecontainer.io` |
-| CNAME | `api` | `forum-diapason-api.francecentral.azurecontainer.io` |
-
-**SSL/TLS** : mode `Flexible`
-
-**Origin Rules** :
-| Règle | Condition | Action |
-|-------|-----------|--------|
-| `front-port` | Hostname = `forum.prettyflacko.fr` | Port → `8080` |
-| `api-port` | Hostname = `api.prettyflacko.fr` | Port → `8081` |
-
----
-
-## Vérification
+## Lancer le projet
 
 ```bash
-# Santé de l'API
-curl -i https://api.prettyflacko.fr/api/auth/me
-# → HTTP/2 401 {"error":"non authentifié"}
+make dev
+```
 
-# Logs des containers
-az container logs -g forum-diapason -n forum-front
-az container logs -g forum-diapason -n forum-api
+Lance en parallèle : Tailwind (watch), serveur API (port 8081) et serveur front avec live reload via Air (port 8080).
+
+Ouvrir http://localhost:8080 dans le navigateur.
+
+---
+
+## Structure
+
+```
+forum-diapason/
+├── main.go                      # entrée du serveur front
+├── go.mod
+├── Makefile
+├── .env.example
+│
+├── api/                         # serveur API
+│   ├── main.go
+│   ├── auth.go
+│   ├── routers.go
+│   ├── profile.go
+│   └── helpers.go
+│
+├── database/
+│   └── database.go              # connexion SQLite + migrations
+│
+├── models/
+│   ├── user.go
+│   └── post.go
+│
+├── handlers/                    # handlers du serveur front
+│   ├── handlers.go
+│   ├── auth.go
+│   ├── page.go
+│   ├── profile.go
+│   └── search.go
+│
+├── services/
+│   ├── auth_service.go
+│   ├── post_service.go
+│   └── user_service.go
+│
+├── utils/
+│   ├── utils.go                 # sessions, cookies
+│   └── mail.go                  # envoi SMTP
+│
+└── frontend/
+    ├── components/              # composants Go template réutilisables
+    ├── pages/                   # une page par route
+    ├── js/
+    │   ├── app.js               # logique globale, modals, auth
+    │   ├── posts.js             # chargement et rendu des posts
+    │   ├── post.js              # page détail d'un post
+    │   └── profile.js           # page profil
+    └── css/
+        ├── input.css            # source Tailwind (à modifier)
+        └── styles.css           # généré — ne pas commiter
 ```
