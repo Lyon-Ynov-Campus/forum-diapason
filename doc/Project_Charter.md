@@ -2,8 +2,8 @@
 
 **École :** Ynov Campus Lyon  
 **Promotion :** B1 Informatique 2025/2026  
-**Durée du projet :** 27/04/2026 au 11/05/2026  
-**Dernière mise à jour :** 04/05/2026  
+**Durée du projet :** 27/04/2026 au 17/05/2026  
+**Dernière mise à jour :** 17/05/2026  
 **Rédigé par :** Michel LEVINE
 
 ---
@@ -12,7 +12,7 @@
 
 Forum Diapason est un forum web sur la thématique musicale, inspiré de Reddit. L'idée est de proposer un espace où les utilisateurs peuvent créer un compte, publier des posts, commenter et réagir aux contenus des autres membres.
 
-Le site doit être accessible au grand public et entièrement déployé pour la soutenance du 11 mai 2026.
+Le site est accessible en ligne à l'adresse https://forum.prettyflacko.fr.
 
 ---
 
@@ -20,19 +20,23 @@ Le site doit être accessible au grand public et entièrement déployé pour la 
 
 ### Ce que le projet inclut
 
-- Un système de comptes avec inscription, connexion sécurisée via JWT, modification et suppression de profil
-- Un système de posts avec création, affichage et fil d'actualité
-- Un système de réactions (likes) et de commentaires sur les posts
-- Une API RESTful en Golang (Gorilla Mux) qui fait le lien entre la base de données SQLite et le frontend
-- Le déploiement continu de l'application
+- Un système de comptes avec inscription, connexion sécurisée par session cookie, modification et suppression de profil
+- Réinitialisation de mot de passe par email (SMTP)
+- Un système de posts avec titre, contenu, tags et image (recadrage + compression)
+- Un système de réactions (likes) et de commentaires avec réponses imbriquées
+- Une recherche fulltext avec filtres de tri
+- Un dark mode persistant
+- Une API RESTful en Golang (stdlib `net/http`) connectée à une base SQLite
+- Le déploiement de l'application sur Azure Container Instances avec Cloudflare
 - La documentation de gestion du projet (charte et rapports hebdomadaires)
-- Une spécification fonctionnelle et une spécification technique *(optionnelles, allégées à la demande du client)*
+- Une spécification fonctionnelle
 
 ### Ce que le projet n'inclut pas
 
 - Les notifications en temps réel
 - La messagerie privée entre utilisateurs
 - La connexion via un service tiers comme Google ou GitHub
+- Un système de modération ou de rôles administrateur
 
 ---
 
@@ -51,7 +55,7 @@ Le site doit être accessible au grand public et entièrement déployé pour la 
 |-----|---------------------|------------------------|
 | Joaquin COZETTE | Gestion de projet, suivi Jira, wireframe | Tâches à jour sur Jira, wireframe livré avant le 30/04 |
 | Quochuy PHAM | Design (maquette Figma), développement front-end | Maquette finalisée en semaine 1, pages conformes au design |
-| Michel LEVINE | Développement back-end, API Golang, base de données SQLite, déploiement, documentation | API fonctionnelle, JWT opérationnel, site déployé, documents rendus |
+| Michel LEVINE | Développement back-end, API Golang, base de données SQLite, déploiement, documentation | API fonctionnelle, sessions opérationnelles, site déployé, documents rendus |
 | Nomenafitia ANDRY | Développement front-end, CSS, documentation utilisateur | Pages implémentées, design responsive, documentation rédigée |
 
 ---
@@ -64,7 +68,7 @@ Les tâches sont toutes suivies dans Jira sur le Tableau Sprint 1.
 
 **Sprint 1 (27/04 au 07/05) :** Mise en place du projet, design, wireframes, maquettes et premières briques de développement.
 
-**Sprint 2 (07/05 au 11/05) :** Authentification JWT, gestion du profil, posts, commentaires, likes, déploiement et documentation.
+**Sprint 2 (07/05 au 17/05) :** Authentification, gestion du profil, posts, commentaires, likes, recherche, déploiement et documentation.
 
 ---
 
@@ -75,7 +79,7 @@ Les tâches sont toutes suivies dans Jira sur le Tableau Sprint 1.
 | 27/04/2026 | Lancement | Configuration Jira, diagramme de Gantt, dépôt GitHub |
 | 30/04/2026 | Point de planification | Découpage des tâches, wireframe Excalidraw, début de la maquette Figma |
 | 07/05/2026 | Weekly 1 | Authentification, modification et suppression de profil, page d'accueil avec header, footer et template |
-| 11/05/2026 | Weekly 2 et Soutenance | Forum complet déployé, présentation technique au client |
+| 17/05/2026 | Soutenance | Forum complet déployé, présentation technique au client |
 
 ---
 
@@ -83,15 +87,14 @@ Les tâches sont toutes suivies dans Jira sur le Tableau Sprint 1.
 
 **Techniques :**
 - Code source hébergé sur GitHub : [forum-diapason](https://github.com/Lyon-Ynov-Campus/forum-diapason)
-- Application web déployée *(URL à compléter)*
-- Base de données SQLite
+- Application web déployée : https://forum.prettyflacko.fr
+- Base de données SQLite persistante (Azure File Share)
+- Images Docker publiées sur Azure Container Registry
 
 **Documentation :**
 - Charte de projet
 - Rapports hebdomadaires x2
-- Spécification fonctionnelle *(optionnelle)*
-- Spécification technique *(optionnelle)*
-- Documentation utilisateur (FAQ)
+- Spécification fonctionnelle
 
 ---
 
@@ -100,20 +103,20 @@ Les tâches sont toutes suivies dans Jira sur le Tableau Sprint 1.
 | Ressource | Détail |
 |-----------|--------|
 | Équipe | 4 membres |
-| Durée | 11 jours ouvrés |
-| Outils | GitHub Classroom, Jira, Excalidraw, Figma, VS Code |
-| Stack technique | Golang avec Gorilla Mux, HTML/CSS/JS vanilla, SQLite, JWT |
+| Durée | 15 jours ouvrés |
+| Outils | GitHub Classroom, Jira, Excalidraw, Figma, VS Code, Docker, Azure |
+| Stack technique | Golang stdlib, HTML/CSS/JS vanilla, Tailwind CSS v4, SQLite, sessions cookie |
 
 ---
 
 ## 9. Risques identifiés
 
-| Risque | Probabilité | Impact | Mitigation |
-|--------|-------------|--------|------------|
-| Délai très serré pour un projet full-stack | Élevée | Élevé | Prioriser le MVP et reporter les fonctionnalités secondaires si nécessaire |
-| Complexité du back-end (Golang, SQLite, JWT, Clean Architecture) | Moyenne | Élevé | S'appuyer sur les ressources fournies et démarrer le back-end tôt |
-| Problèmes de déploiement en dernière minute | Moyenne | Élevé | Tester le déploiement dès le début du Sprint 2 |
-| Ajout de fonctionnalités non prioritaires avant que le cœur soit terminé | Moyenne | Moyen | Traiter les fonctionnalités principales d'abord, les extras seulement si le temps le permet |
+| Risque | Probabilité | Impact | Statut |
+|--------|-------------|--------|--------|
+| Délai très serré pour un projet full-stack | Élevée | Élevé | Géré — MVP livré dans les délais |
+| Complexité du back-end (Golang, SQLite, architecture 2 serveurs) | Moyenne | Élevé | Résolu |
+| Problèmes de déploiement en dernière minute | Moyenne | Élevé | Résolu — déployé sur Azure ACI + Cloudflare |
+| Ajout de fonctionnalités non prioritaires avant que le cœur soit terminé | Moyenne | Moyen | Géré — priorisation MVP respectée |
 
 ---
 
@@ -127,4 +130,4 @@ On considère qu'une fonctionnalité est terminée quand :
 
 ---
 
-*Document rédigé par Michel LEVINE. Dernière révision : 07/05/2026.*
+*Document rédigé par Michel LEVINE. Dernière révision : 17/05/2026.*

@@ -2,10 +2,10 @@
 
 **École :** Ynov Campus Lyon  
 **Promotion :** B1 Informatique 2025/2026  
-**Durée du projet :** 27/04/2026 au 11/05/2026  
-**Dernière mise à jour :** 08/05/2026  
+**Durée du projet :** 27/04/2026 au 17/05/2026  
+**Dernière mise à jour :** 17/05/2026  
 **Rédigé par :** Michel LEVINE  
-**Statut :** En cours
+**Statut :** Livré
 
 ---
 
@@ -23,7 +23,8 @@
   - [2.3. Commentaires](#23-commentaires)
   - [2.4. Likes](#24-likes)
   - [2.5. Profil utilisateur](#25-profil-utilisateur)
-  - [2.6. Navigation](#26-navigation)
+  - [2.6. Recherche et filtres](#26-recherche-et-filtres)
+  - [2.7. Navigation](#27-navigation)
 - [3. Cas d'utilisation](#3-cas-dutilisation)
 - [4. Maquettes et wireframes](#4-maquettes-et-wireframes)
   - [4.1. Charte graphique](#41-charte-graphique)
@@ -31,8 +32,7 @@
   - [4.3. Maquette haute fidélité](#43-maquette-haute-fidélité)
   - [4.4. Pages couvertes](#44-pages-couvertes)
 - [5. Exigences non fonctionnelles](#5-exigences-non-fonctionnelles)
-- [6. Améliorations futures](#6-améliorations-futures)
-- [7. Conclusion](#7-conclusion)
+- [6. Conclusion](#7-conclusion)
 
 </details>
 
@@ -44,12 +44,12 @@
 
 Forum Diapason est un forum web dédié à la musique, inspiré de Reddit. Le projet est réalisé dans le cadre de la formation B1 Informatique à Ynov Campus Lyon, dans des conditions professionnelles simulées.
 
-L'objectif est de proposer une plateforme communautaire où les passionnés de musique peuvent créer un compte, partager leurs découvertes, avis et discussions musicales sous forme de posts, interagir avec les autres membres via des commentaires et des réactions, et naviguer sur un fil d'actualité. Le site doit être déployé et accessible en ligne à la date de la soutenance.
+L'objectif est de proposer une plateforme communautaire où les passionnés de musique peuvent créer un compte, partager leurs découvertes, avis et discussions musicales sous forme de posts, interagir avec les autres membres via des commentaires et des réactions, et naviguer sur un fil d'actualité. Le site est déployé et accessible en ligne.
 
 | | |
 |--|--|
 | **Dépôt GitHub** | [forum-diapason](https://github.com/Lyon-Ynov-Campus/forum-diapason) |
-| **URL de déploiement** | *(à compléter)* |
+| **URL de déploiement** | https://forum.prettyflacko.fr |
 
 ---
 
@@ -58,13 +58,18 @@ L'objectif est de proposer une plateforme communautaire où les passionnés de m
 **Ce que le projet couvre :**
 
 - Création de compte, connexion et déconnexion
-- Modification et suppression du profil utilisateur
-- Publication, affichage et suppression de posts
-- Système de commentaires sur les posts
+- Réinitialisation du mot de passe par email
+- Modification et suppression du profil utilisateur (avatar, bio, mot de passe)
+- Suppression du compte
+- Publication, affichage et suppression de posts avec images
+- Système de tags sur les posts
+- Système de commentaires avec réponses imbriquées
 - Système de likes sur les posts
 - Consultation du profil d'autres utilisateurs
-- Interface responsive, accessible sur desktop et mobile
-- Déploiement continu de l'application
+- Recherche fulltext (titre, contenu, tags) avec filtres de tri
+- Suggestions d'utilisateurs dans la barre de recherche
+- Interface responsive avec dark mode
+- Déploiement de l'application sur Azure
 
 **Ce qui est hors périmètre :**
 
@@ -72,9 +77,6 @@ L'objectif est de proposer une plateforme communautaire où les passionnés de m
 - Messagerie privée entre utilisateurs
 - Connexion via un service tiers (Google, GitHub, etc.)
 - Système de modération ou de rôles administrateur
-- Pièces jointes sur les posts (images, fichiers)
-- Recherche par mot-clé 
-- Page découverte 
 
 ---
 
@@ -96,13 +98,13 @@ L'objectif est de proposer une plateforme communautaire où les passionnés de m
 | **Post** | Message publié par un utilisateur, visible par tous les visiteurs |
 | **Commentaire** | Réponse textuelle d'un utilisateur à un post |
 | **Like** | Action exprimant un avis positif sur un post, réversible |
+| **Tag** | Étiquette thématique associée à un post pour faciliter la recherche |
 | **Fil d'actualité** | Page principale affichant les posts par ordre chronologique décroissant |
-| **JWT** | JSON Web Token — mécanisme d'authentification sécurisé utilisé pour maintenir la session côté client |
+| **Session cookie** | Cookie HttpOnly stockant l'identifiant de session côté client, utilisé pour maintenir la connexion |
 | **API REST** | Interface de programmation permettant la communication entre le frontend et le backend via des requêtes HTTP |
 | **MVP** | Minimum Viable Product — version minimale fonctionnelle du produit |
-| **Déploiement continu** | Mise en ligne automatique de l'application à chaque mise à jour du code sur la branche principale |
 | **SQLite** | Base de données légère utilisée pour stocker les données de l'application |
-| **Gorilla Mux** | Bibliothèque Golang utilisée pour gérer le routage de l'API |
+| **ACI** | Azure Container Instances — service Azure pour déployer des conteneurs Docker |
 
 ---
 
@@ -112,19 +114,23 @@ L'objectif est de proposer une plateforme communautaire où les passionnés de m
 
 #### Inscription
 
-Un visiteur peut créer un compte en renseignant un identifiant unique et un mot de passe. Si l'identifiant est déjà utilisé, un message d'erreur lui est affiché. Le mot de passe est stocké de manière sécurisée (haché, jamais en clair). Une fois le compte créé, l'utilisateur est connecté automatiquement.
+Un visiteur peut créer un compte en renseignant son nom, un pseudo unique, une adresse email et un mot de passe. Si le pseudo ou l'email est déjà utilisé, un message d'erreur est affiché. Le mot de passe est stocké de manière sécurisée (haché avec bcrypt, jamais en clair). Une fois le compte créé, l'utilisateur est connecté automatiquement.
 
 #### Connexion et déconnexion
 
-L'utilisateur se connecte avec son identifiant et son mot de passe. Une session est créée via un token JWT et maintenue côté client. En cas d'identifiants incorrects, un message d'erreur s'affiche. L'utilisateur peut se déconnecter à tout moment, ce qui détruit la session.
+L'utilisateur se connecte avec son email ou son pseudo et son mot de passe. Une session est créée et maintenue via un cookie HttpOnly. En cas d'identifiants incorrects, un message d'erreur s'affiche. L'utilisateur peut se déconnecter à tout moment, ce qui détruit la session.
+
+#### Réinitialisation du mot de passe
+
+Un utilisateur peut demander la réinitialisation de son mot de passe en renseignant son adresse email. Un lien de réinitialisation valable 1 heure lui est envoyé par email. Ce lien lui permet de définir un nouveau mot de passe.
 
 #### Modification du profil
 
-L'utilisateur connecté peut modifier son identifiant ou son mot de passe depuis sa page de paramètres. La modification nécessite de confirmer le mot de passe actuel.
+L'utilisateur connecté peut modifier son nom, son pseudo, son email, son avatar et son mot de passe depuis sa page de paramètres.
 
 #### Suppression du compte
 
-L'utilisateur peut supprimer son compte de façon définitive. Une confirmation est demandée avant la suppression. Une fois le compte supprimé, l'utilisateur est redirigé vers la page d'accueil.
+L'utilisateur peut supprimer son compte de façon définitive depuis les paramètres. Une confirmation avec le mot de passe est demandée. Une fois le compte supprimé, toutes ses données sont effacées et il est redirigé vers la page d'accueil.
 
 ---
 
@@ -132,43 +138,49 @@ L'utilisateur peut supprimer son compte de façon définitive. Une confirmation 
 
 #### Création d'un post
 
-Un utilisateur connecté peut créer un post en renseignant un titre et un contenu textuel. Les posts peuvent porter sur n'importe quel sujet musical : découvertes d'artistes, avis sur des albums, discussions sur des genres, partage de concerts, etc. Le post est horodaté et associé à son auteur. Un post avec un titre ou un contenu vide ne peut pas être publié.
+Un utilisateur connecté peut créer un post en renseignant un titre, un contenu, des tags et optionnellement une image. L'image peut être recadrée avant envoi. Elle est compressée côté client si elle dépasse 2 Mo. Un post avec un titre ou un contenu vide ne peut pas être publié.
 
 #### Affichage des posts
 
-Tous les visiteurs, connectés ou non, peuvent consulter les posts. La page d'accueil affiche un fil de posts du plus récent au plus ancien. Chaque post y affiche son titre, son auteur, sa date de publication, le nombre de likes et le nombre de commentaires.
+Tous les visiteurs, connectés ou non, peuvent consulter les posts. La page d'accueil affiche un fil de posts avec titre, auteur, date, tags, image et compteurs. Une colonne "top posts" présente les 6 posts les plus likés.
 
 #### Page d'un post
 
-Un clic sur un post ouvre sa page dédiée, qui affiche le contenu complet, les commentaires et le bouton de réaction.
+Un clic sur un post ouvre sa page dédiée, qui affiche le contenu complet, l'image, les commentaires imbriqués et le bouton de réaction.
 
 #### Suppression d'un post
 
-L'auteur d'un post peut le supprimer. Un post supprimé disparaît du fil et de sa page.
+L'auteur d'un post peut le supprimer. Un post supprimé disparaît immédiatement du fil.
 
 ---
 
 ### 2.3. Commentaires
 
-Un utilisateur connecté peut commenter un post. Les commentaires sont affichés du plus ancien au plus récent. L'auteur d'un commentaire peut le supprimer. Un champ vide ne peut pas être soumis.
+Un utilisateur connecté peut commenter un post et répondre aux commentaires existants. Les commentaires sont affichés du plus ancien au plus récent. L'auteur d'un commentaire peut le supprimer.
 
 ---
 
 ### 2.4. Likes
 
-Un utilisateur connecté peut liker un post. Il ne peut liker un même post qu'une seule fois. Il peut retirer son like en cliquant à nouveau. Le compteur de likes est visible par tous les visiteurs.
+Un utilisateur connecté peut liker un post. Il ne peut liker un même post qu'une seule fois. Il peut retirer son like. Le compteur de likes est visible par tous.
 
 ---
 
 ### 2.5. Profil utilisateur
 
-Chaque utilisateur dispose d'une page de profil consultable par les autres membres. Elle affiche l'identifiant, la date d'inscription et la liste des posts publiés. Sur son propre profil, l'utilisateur connecté voit également les options de modification et de suppression de compte.
+Chaque utilisateur dispose d'une page de profil consultable. Elle affiche l'avatar, le pseudo et la liste des posts publiés. Sur son propre profil, l'utilisateur voit les options de modification.
 
 ---
 
-### 2.6. Navigation
+### 2.6. Recherche et filtres
 
-Toutes les pages partagent une barre de navigation et un pied de page communs. La navbar affiche le nom du forum, un lien vers le fil principal et, selon l'état de connexion, soit un lien vers le profil avec un bouton de déconnexion, soit un lien vers la page de connexion.
+La barre de recherche permet de filtrer les posts par mot-clé (titre, contenu, tags). Les filtres permettent de trier par récent, populaire ou tendance. Des suggestions d'utilisateurs apparaissent en temps réel lors de la saisie.
+
+---
+
+### 2.7. Navigation
+
+Toutes les pages partagent un header commun avec barre de recherche, menu de navigation et toggle dark mode. Un bouton paramètres donne accès aux options du compte.
 
 ---
 
@@ -179,9 +191,9 @@ Toutes les pages partagent une barre de navigation et un pied de page communs. L
 | | |
 |--|--|
 | **Acteur** | Visiteur non connecté |
-| **Déclencheur** | Il clique sur "S'inscrire" |
-| **Scénario** | Il remplit le formulaire avec un identifiant et un mot de passe, puis valide. Le système vérifie la disponibilité de l'identifiant, crée le compte et connecte l'utilisateur automatiquement. |
-| **Échec** | Si l'identifiant est déjà pris, un message d'erreur s'affiche et le formulaire reste ouvert. |
+| **Déclencheur** | Il clique sur "Register" |
+| **Scénario** | Il remplit le formulaire (nom, pseudo, email, mot de passe), valide. Le système crée le compte et connecte l'utilisateur. |
+| **Échec** | Si le pseudo ou l'email est déjà pris, un message d'erreur s'affiche. |
 
 ---
 
@@ -190,8 +202,8 @@ Toutes les pages partagent une barre de navigation et un pied de page communs. L
 | | |
 |--|--|
 | **Acteur** | Visiteur non connecté |
-| **Déclencheur** | Il clique sur "Se connecter" |
-| **Scénario** | Il saisit son identifiant et son mot de passe. Le système vérifie les informations, génère un token JWT et redirige vers le fil principal. |
+| **Déclencheur** | Il clique sur "Sign in" |
+| **Scénario** | Il saisit son email ou pseudo et son mot de passe. Le système crée une session et redirige vers le fil. |
 | **Échec** | Si les identifiants sont incorrects, un message d'erreur s'affiche. |
 
 ---
@@ -201,9 +213,9 @@ Toutes les pages partagent une barre de navigation et un pied de page communs. L
 | | |
 |--|--|
 | **Acteur** | Utilisateur connecté |
-| **Déclencheur** | Il clique sur "Nouveau post" |
-| **Scénario** | Il saisit un titre et un contenu musical, puis valide. Le post est publié et apparaît en tête du fil. |
-| **Échec** | Si le titre ou le contenu est vide, le formulaire affiche une erreur. |
+| **Déclencheur** | Il clique sur le formulaire de création de post |
+| **Scénario** | Il saisit titre, contenu, tags, image optionnelle et valide. Le post apparaît en tête du fil. |
+| **Échec** | Si le titre ou le contenu est vide, une erreur s'affiche. |
 
 ---
 
@@ -213,8 +225,8 @@ Toutes les pages partagent une barre de navigation et un pied de page communs. L
 |--|--|
 | **Acteur** | Utilisateur connecté |
 | **Déclencheur** | Il ouvre un post et saisit un commentaire |
-| **Scénario** | Il rédige son commentaire dans le champ prévu et valide. Le commentaire apparaît immédiatement sous le post. |
-| **Échec** | Si le champ est vide, le formulaire affiche une erreur. |
+| **Scénario** | Il rédige son commentaire et valide. Il apparaît immédiatement sous le post. |
+| **Échec** | Si le champ est vide, rien n'est envoyé. |
 
 ---
 
@@ -223,9 +235,9 @@ Toutes les pages partagent une barre de navigation et un pied de page communs. L
 | | |
 |--|--|
 | **Acteur** | Utilisateur connecté |
-| **Déclencheur** | Il clique sur le bouton like d'un post |
-| **Scénario** | Le compteur s'incrémente et le bouton indique visuellement que le like est actif. Un second clic retire le like et décrémente le compteur. |
-| **Échec** | Si l'utilisateur n'est pas connecté, il est redirigé vers la page de connexion. |
+| **Déclencheur** | Il clique sur le bouton like |
+| **Scénario** | Le compteur s'incrémente et le bouton indique visuellement que le like est actif. Un second clic retire le like. |
+| **Échec** | Si l'utilisateur n'est pas connecté, le like n'est pas enregistré. |
 
 ---
 
@@ -234,10 +246,10 @@ Toutes les pages partagent une barre de navigation et un pied de page communs. L
 | | |
 |--|--|
 | **Acteur** | Utilisateur connecté |
-| **Déclencheur** | Il accède à sa page de paramètres |
-| **Scénario (modification)** | Il renseigne les nouvelles informations et confirme avec son mot de passe actuel. Les modifications sont enregistrées. |
-| **Scénario (suppression)** | Il clique sur "Supprimer mon compte" et confirme l'action. Le compte est supprimé et il est redirigé vers l'accueil. |
-| **Échec** | Si le mot de passe actuel est incorrect, un message d'erreur s'affiche. |
+| **Déclencheur** | Il accède aux paramètres via l'icône ⚙️ |
+| **Scénario (modification)** | Il renseigne les nouvelles informations et sauvegarde. |
+| **Scénario (suppression)** | Il confirme avec son mot de passe. Le compte et toutes les données sont supprimés. |
+| **Échec** | Si le mot de passe est incorrect, un message d'erreur s'affiche. |
 
 ---
 
@@ -245,13 +257,12 @@ Toutes les pages partagent une barre de navigation et un pied de page communs. L
 
 ### 4.1. Charte graphique
 
-La charte graphique de Forum Diapason est en cours de définition par l'équipe design. Elle sera alignée sur la thématique musicale du forum.
-
-| Élément | Statut |
+| Élément | Détail |
 |---------|--------|
-| Palette de couleurs | *(à compléter)* |
-| Typographie | *(à compléter)* |
-| Logo | *(à compléter)* |
+| Palette | Noir (#000), blanc (#fff), gris (#e5e7eb) |
+| Typographie | System UI sans-serif |
+| Style | Minimaliste, inspiré des forums typographiques |
+| Thème | Clair et sombre (dark mode) |
 
 ---
 
@@ -259,19 +270,15 @@ La charte graphique de Forum Diapason est en cours de définition par l'équipe 
 
 Le wireframe a été réalisé sur Excalidraw et couvre les pages principales du site.
 
-*image*
-
 Lien : https://excalidraw.com/#room=9090ab9a1cfda3075dfa,BKUC3vwf2gLmmUpQgZKVyQ
 
 ---
 
 ### 4.3. Maquette haute fidélité
 
-La maquette est en cours de réalisation sur Figma par PHAM Huy et ANDRY Nomenafitia.
+La maquette a été réalisée sur Figma par PHAM Huy et ANDRY Nomenafitia.
 
-*image*
-
-Lien Figma : *(à compléter)*
+Lien : https://www.figma.com/design/E4SGgSbexa4pVr7Nh7Mnqw/maquette-diapason?node-id=40-4072&t=qFlOZp2EpggMAXBz-0
 
 ---
 
@@ -279,11 +286,14 @@ Lien Figma : *(à compléter)*
 
 | Page | Description |
 |------|-------------|
-| Accueil | Fil de posts musicaux, navbar, footer, bouton de création de post |
-| Connexion et inscription | Formulaires d'authentification |
-| Page d'un post | Contenu complet, commentaires, bouton like |
-| Profil utilisateur | Informations du compte, liste des posts publiés |
-| Paramètres | Modification et suppression du compte |
+| Accueil | Fil de posts, barre de recherche, top posts, création de post |
+| Connexion | Formulaire d'authentification |
+| Inscription | Formulaire de création de compte |
+| Page d'un post | Contenu complet, image, commentaires, like |
+| Profil utilisateur | Avatar, pseudo, liste des posts |
+| Paramètres | Modal : modification du compte, suppression |
+| Mot de passe oublié | Formulaire de demande de reset |
+| Réinitialisation | Formulaire de nouveau mot de passe |
 
 ---
 
@@ -293,40 +303,18 @@ Lien Figma : *(à compléter)*
 |-----------|----------|
 | Ergonomie | L'interface doit être intuitive et utilisable sans formation préalable |
 | Responsivité | Le site doit fonctionner correctement sur desktop et mobile |
-| Performance | Les pages doivent se charger en moins de 3 secondes en conditions normales |
-| Sécurité | Les mots de passe sont hachés, l'authentification repose sur des tokens JWT |
-| Déploiement | L'application doit être accessible depuis une URL publique le jour de la soutenance |
-| Compatibilité | Le site doit fonctionner sur les navigateurs modernes (Chrome, Firefox, Edge) |
+| Performance | Les pages doivent se charger rapidement |
+| Sécurité | Mots de passe hachés avec bcrypt, sessions cookie HttpOnly, protection CORS |
+| Déploiement | Application accessible depuis https://forum.prettyflacko.fr |
+| Compatibilité | Le site fonctionne sur les navigateurs modernes (Chrome, Firefox, Edge) |
+| Persistance | Les données (base SQLite, uploads) persistent entre les redémarrages via Azure File Share |
 
 ---
 
-## 6. Améliorations futures
+## 6. Conclusion
 
-Ces fonctionnalités ne font pas partie du MVP mais pourraient être envisagées dans une version ultérieure du projet.
-
-**Recherche par mot-clé**
-Permettre aux utilisateurs de rechercher des posts par titre ou contenu, avec filtrage par popularité ou date.
-
-**Page découverte**
-Une page dédiée mettant en avant les posts les plus likés ou les discussions les plus actives, pour favoriser la découverte de contenu musical.
-
-**Catégories et tags musicaux**
-Associer des tags aux posts (genre musical, artiste, album, instrument) pour organiser le contenu et faciliter la navigation.
-
-**Pièces jointes**
-Permettre l'ajout d'images ou de liens dans les posts, par exemple pour partager des pochettes d'albums ou des clips.
-
-**Système de notifications**
-Notifier l'utilisateur lorsqu'un commentaire est posté sur l'un de ses posts ou lorsqu'il reçoit un like.
+Forum Diapason offre un espace d'échange complet pour les passionnés de musique. Le projet a été livré avec l'ensemble des fonctionnalités prévues plus plusieurs ajouts : recherche fulltext, tags, images sur les posts, réinitialisation de mot de passe par email, dark mode et déploiement Azure avec HTTPS.
 
 ---
 
-## 7. Conclusion
-
-Forum Diapason vise à offrir un espace d'échange simple et agréable pour les passionnés de musique. En se concentrant sur les fonctionnalités essentielles — comptes, posts, commentaires et likes — le projet répond aux exigences du cahier des charges tout en restant réalisable dans le délai imparti de deux semaines.
-
-Ce document constitue la référence fonctionnelle du projet pour l'ensemble de l'équipe. Il sera mis à jour au fur et à mesure de l'avancement, notamment pour intégrer les captures de la maquette Figma et les éléments de charte graphique une fois finalisés.
-
----
-
-*Document rédigé par Michel LEVINE. Dernière révision : 08/05/2026.*
+*Document rédigé par Michel LEVINE. Dernière révision : 17/05/2026.*
