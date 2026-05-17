@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="fr" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inscription — Forum Diapason</title>
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body class="flex flex-col min-h-screen">
+    {{template "header" .}}
+    {{template "modal-edit-profile" .}}
+    {{template "modal-settings" .}}
+    {{template "modal-contacts" .}}
+    {{template "modal-filter" .}}
+    {{template "modal-settings" .}}
+
+    <main class="flex-1 flex items-center justify-center gap-16 px-8">
+
+        <div class="bg-gray-100 flex flex-col items-center justify-center gap-12 shrink-0 w-[420px] h-[440px]">
+            <span class="text-4xl font-bold">Diapason</span>
+            <div class="w-36 h-36 flex items-center justify-center bg-black">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
+                </svg>
+            </div>
+        </div>
+
+        <form method="POST" action="/register" class="flex flex-col gap-4 w-80">
+
+            {{if .Error}}
+            <p class="text-sm text-red-600 border border-red-200 bg-red-50 px-3 py-2">{{.Error}}</p>
+            {{end}}
+
+            <div class="flex flex-col gap-1">
+                <label class="text-sm text-gray-700" for="nom">Nom</label>
+                <input id="nom" name="nom" type="text" value="{{.Nom}}" placeholder="Nom" required
+                    class="border border-gray-300 px-4 py-2.5 text-sm outline-none focus:border-gray-500 placeholder:text-gray-400 w-full">
+            </div>
+
+            <div class="flex flex-col gap-1">
+                <label class="text-sm text-gray-700" for="pseudo">Pseudo</label>
+                <input id="pseudo" name="pseudo" type="text" value="{{.Pseudo}}" placeholder="Pseudo" required minlength="3" maxlength="30"
+                    class="border border-gray-300 px-4 py-2.5 text-sm outline-none focus:border-gray-500 placeholder:text-gray-400 w-full">
+            </div>
+
+            <div class="flex flex-col gap-1">
+                <label class="text-sm text-gray-700" for="email">Email</label>
+                <input id="email" name="email" type="email" value="{{.Email}}" placeholder="Email" required
+                    class="border border-gray-300 px-4 py-2.5 text-sm outline-none focus:border-gray-500 placeholder:text-gray-400 w-full">
+            </div>
+
+            <div class="flex flex-col gap-1">
+                <label class="text-sm text-gray-700" for="password">Mot de passe</label>
+                <div class="relative">
+                    <input id="password" name="password" type="password" placeholder="Mot de passe" required minlength="8"
+                        class="border border-gray-300 px-4 py-2.5 text-sm outline-none focus:border-gray-500 placeholder:text-gray-400 w-full pr-10">
+                    <button type="button" class="toggle-password absolute right-3 top-3 text-gray-500 hover:text-gray-700" data-target="password">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <div class="flex flex-col gap-1">
+                <label class="text-sm text-gray-700" for="password_confirm">Confirmer mot de passe</label>
+                <div class="relative">
+                    <input id="password_confirm" name="password_confirm" type="password" placeholder="Confirmer mot de passe" required minlength="8"
+                        class="border border-gray-300 px-4 py-2.5 text-sm outline-none focus:border-gray-500 placeholder:text-gray-400 w-full pr-10">
+                    <button type="button" class="toggle-password absolute right-3 top-3 text-gray-500 hover:text-gray-700" data-target="password_confirm">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <button type="submit"
+                class="bg-gray-200 text-gray-700 py-2.5 text-sm hover:bg-gray-300 transition-colors w-full mt-1">
+                Register
+            </button>
+
+        </form>
+
+    </main>
+
+    {{template "footer" .}}
+    <script src="/js/app.js"></script>
+</body>
+</html>

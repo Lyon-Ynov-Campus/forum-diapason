@@ -1,0 +1,21 @@
+{{define "top-post-card"}}
+<template id="top-post-card">
+    <article class="border border-gray-200 p-3 flex flex-col gap-1">
+
+        <div class="flex items-center gap-2">
+            <div class="w-7 h-7 rounded-full border border-gray-300 flex items-center justify-center text-gray-400 shrink-0">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+            </div>
+            <span class="top-post-author font-bold text-xs uppercase"></span>
+        </div>
+
+        <div class="border-t border-dashed border-gray-300 pt-1">
+            <p class="top-post-content text-xs text-gray-700 line-clamp-2"></p>
+            <p class="top-post-date text-xs text-gray-400 italic mt-1"></p>
+        </div>
+
+    </article>
+</template>
+{{end}}

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Accueil — Forum Diapason</title>
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+    {{template "header" .}}
+    {{template "modal-edit-profile" .}}
+    {{template "modal-contacts" .}}
+    {{template "modal-filter" .}}
+    {{template "modal-settings" .}}
+    {{template "modal-crop" .}}
+    {{template "post-card" .}}
+    {{template "top-post-card" .}}
+
+    <div class="grid grid-cols-[300px_minmax(0,1fr)_280px] gap-8 px-8 py-6 max-w-[1600px] mx-auto">
+
+        <!-- Colonne gauche : créer un post -->
+        {{template "create-post" .}}
+
+        <!-- Colonne centre : feed -->
+        <div id="posts-container" class="flex flex-col gap-4"></div>
+
+        <!-- Colonne droite : top posts -->
+        <aside class="sticky top-4 self-start border border-gray-200">
+            <h2 class="font-bold text-xs text-center py-2 border-b border-gray-200">TOP POST</h2>
+            <div id="top-posts-container" class="flex flex-col"></div>
+        </aside>
+
+    </div>
+
+    {{template "footer" .}}
+    <script src="/js/app.js"></script>
+    <script src="/js/posts.js"></script>
+</body>
+</html>

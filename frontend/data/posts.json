@@ -1,0 +1,62 @@
+[
+    {
+        "id": 1,
+        "author_id": 1,
+        "author": "jazzlover",
+        "title": "Miles Davis - Kind of Blue, un chef d'oeuvre intemporel",
+        "content": "Je réécoute cet album depuis 20 ans et je découvre encore des choses. La façon dont il joue avec les modes...c'est hallucinant.",
+        "tags": ["jazz", "miles-davis", "album"],
+        "likes": 42,
+        "created_at": "2026-05-01T10:23:00Z"
+    },
+    {
+        "id": 2,
+        "author_id": 2,
+        "author": "beatmaker92",
+        "title": "Quel DAW vous utilisez pour produire ?",
+        "content": "J'hésite entre Ableton et FL Studio depuis des mois. Vous avez des retours ? Je fais surtout du hip-hop et de l'électro.",
+        "tags": ["production", "daw", "ableton", "fl-studio"],
+        "likes": 18,
+        "created_at": "2026-05-02T14:05:00Z"
+    },
+    {
+        "id": 3,
+        "author_id": 3,
+        "author": "guitariste_du_dimanche",
+        "title": "Tabs de Comfortably Numb - Pink Floyd",
+        "content": "Je cherche une bonne transcription du solo de Gilmour, les versions que je trouve en ligne sont approximatives. Quelqu'un a une source fiable ?",
+        "tags": ["guitare", "pink-floyd", "tabs"],
+        "likes": 27,
+        "created_at": "2026-05-02T18:44:00Z"
+    },
+    {
+        "id": 4,
+        "author_id": 4,
+        "author": "vinylhunter",
+        "title": "Trouvaille du week-end : Coltrane en parfait état à 3€",
+        "content": "Vide grenier à Lyon, je tombe sur A Love Supreme en pressage original. Le vendeur ne savait pas ce qu'il avait entre les mains.",
+        "tags": ["vinyle", "coltrane", "bonne-affaire"],
+        "likes": 89,
+        "created_at": "2026-05-03T09:12:00Z"
+    },
+    {
+        "id": 5,
+        "author_id": 5,
+        "author": "synth_addict",
+        "title": "Le Moog Minimoog Model D est de retour en production",
+        "content": "Moog vient d'annoncer une nouvelle série limitée. 4000€ le bébé mais le son est incomparable. Quelqu'un prévoit de craquer ?",
+        "tags": ["synthétiseur", "moog", "gear"],
+        "likes": 35,
+        "created_at": "2026-05-03T21:30:00Z"
+    },
+    {
+        "id": 6,
+        "author_id": 6,
+        "author": "classique_forever",
+        "title": "Recommandations d'interprètes pour les sonates de Beethoven ?",
+        "content": "Je connais Barenboim et Brendel. Est-ce que quelqu'un a écouté la version de Buchbinder ? Ça vaut le coup ?",
+        "tags": ["classique", "beethoven", "piano"],
+        "likes": 14,
+        "created_at": "2026-05-04T08:00:00Z"
+    }
+]

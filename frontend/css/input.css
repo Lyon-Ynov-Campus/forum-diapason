@@ -1,0 +1,73 @@
+@import "tailwindcss";
+
+/* Dark mode déclenché par la classe .dark sur <html> */
+@custom-variant dark (&:is(.dark *));
+
+/* Masque la flèche par défaut des <summary> (toutes les sections accordéon) */
+summary::-webkit-details-marker { display: none; }
+summary { list-style: none; }
+
+/* Chevron des <details> : pivote quand la section est ouverte */
+.settings-section > summary svg { transition: transform 0.2s; }
+.settings-section[open] > summary svg { transform: rotate(180deg); }
+
+/* Modal des parametres : largeur fixe pour que le pli/depli des sections
+   n'agite pas la box horizontalement */
+.settings-modal-container {
+    width: 560px;
+    max-width: 95vw;
+    max-height: 85vh;
+}
+
+/* ── Zone de danger (modal-settings) ── */
+/* Styles definis ici pour ne pas dependre du JIT Tailwind sur les classes red-*
+   qui pourraient ne pas etre compilees si watch n'a pas tourne */
+.danger-summary           { background-color: rgba(254, 226, 226, 0.3); }
+.danger-summary:hover     { background-color: rgba(254, 226, 226, 0.6); }
+.danger-title             { color: #dc2626; }
+.danger-chevron           { color: #dc2626; }
+.danger-content           { background-color: rgba(254, 226, 226, 0.35); border-top: 1px solid #fecaca; }
+.danger-content > * + *   { border-top: 1px solid #fecaca; }
+.danger-label             { color: #b91c1c; }
+.danger-help              { color: rgba(220, 38, 38, 0.75); }
+.danger-btn               { border: 1px solid #fca5a5; background-color: #fff; color: #b91c1c; }
+.danger-btn:hover         { background-color: #fef2f2; }
+.danger-input             { border: 1px solid #fecaca; background-color: #fff; }
+.danger-input::placeholder { color: #fca5a5; }
+.danger-input:focus       { border-color: #dc2626; outline: none; }
+.danger-submit            { background-color: #dc2626; color: #fff; }
+.danger-submit:hover      { background-color: #b91c1c; }
+
+.dark .danger-summary         { background-color: rgba(127, 29, 29, 0.25); }
+.dark .danger-summary:hover   { background-color: rgba(127, 29, 29, 0.4); }
+.dark .danger-content         { background-color: rgba(127, 29, 29, 0.15); border-top-color: #7f1d1d; }
+.dark .danger-content > * + * { border-top-color: #7f1d1d; }
+.dark .danger-btn             { background-color: #1a1a1a; border-color: #7f1d1d; color: #fca5a5; }
+.dark .danger-btn:hover       { background-color: #2a1010; }
+.dark .danger-input           { background-color: #1a1a1a; border-color: #7f1d1d; color: #fca5a5; }
+
+/* ── Overrides dark mode globaux ── */
+.dark body          { background-color: #111; color: #e5e5e5; }
+.dark header        { background-color: #1a1a1a; border-color: #333; }
+.dark footer        { background-color: #1a1a1a; border-color: #333; }
+.dark input,
+.dark textarea      { background-color: #222; color: #e5e5e5; border-color: #444; }
+.dark input::placeholder,
+.dark textarea::placeholder { color: #666; }
+.dark article       { background-color: #1a1a1a; border-color: #333; }
+.dark aside         { background-color: #1a1a1a; border-color: #333; }
+.dark [id^="modal-"] > div { background-color: #1a1a1a; }
+.dark .divide-gray-100 > * { border-color: #333; }
+.dark .border-gray-200 { border-color: #333; }
+.dark .border-gray-300 { border-color: #444; }
+.dark .bg-gray-100  { background-color: #222; }
+.dark .bg-gray-200  { background-color: #333; }
+.dark .text-gray-400 { color: #888; }
+.dark .text-gray-500 { color: #999; }
+.dark .text-gray-700 { color: #ccc; }
+.dark .hover\:bg-gray-50:hover { background-color: #222; }
+.dark .hover\:bg-gray-100:hover { background-color: #2a2a2a; }
+.dark .hover\:bg-gray-800:hover { background-color: #2a2a2a; }
+.dark #search-suggestions { background-color: #1a1a1a; border-color: #333; }
+.dark #search-suggestions a { border-color: #333; }
+.dark #search-suggestions .bg-gray-200 { background-color: #333; }

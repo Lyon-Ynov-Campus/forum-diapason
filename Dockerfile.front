@@ -1,0 +1,42 @@
+FROM golang:1.25 AS builder
+
+WORKDIR /app
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    gcc libc6-dev curl ca-certificates \
+ && rm -rf /var/lib/apt/lists/*
+
+COPY go.mod go.sum ./
+RUN go mod download
+
+COPY . .
+
+RUN curl -sLo tailwindcss \
+    https://github.com/tailwindlabs/tailwindcss/releases/latest/download/tailwindcss-linux-x64 \
+ && chmod +x tailwindcss \
+ && ./tailwindcss \
+    -i ./frontend/css/input.css \
+    -o ./frontend/css/styles.css \
+    --minify \
+    --content "./frontend/**/*.html,./frontend/**/*.js"
+
+RUN CGO_ENABLED=1 GOOS=linux go build -o /out/forum-front .
+
+
+FROM debian:bookworm-slim AS runtime
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ca-certificates \
+ && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+COPY --from=builder /out/forum-front /app/forum-front
+COPY --from=builder /app/frontend    /app/frontend
+COPY --from=builder /app/public      /app/public
+
+RUN mkdir -p /app/public/avatars /app/public/posts /app/data
+
+EXPOSE 8080
+
+CMD ["/app/forum-front"]

@@ -1,0 +1,70 @@
+{{define "modal-filter"}}
+<div id="modal-filter" class="hidden fixed inset-0 bg-black/40 z-50 flex items-center justify-center">
+
+    <div class="bg-white w-[500px]">
+
+        <div class="border border-gray-200">
+            <div class="flex items-center justify-between px-5 py-3 border-b border-gray-200">
+                <h2 class="font-bold text-sm text-center w-full tracking-wider">FILTRER</h2>
+                <button id="modal-filter-close" class="text-gray-400 hover:text-black text-xl leading-none absolute right-5">×</button>
+            </div>
+
+            <div class="grid grid-cols-2 divide-x divide-gray-200">
+
+                <div class="px-8 py-5 flex flex-col gap-4">
+                    <p class="font-bold text-sm text-center">TRI</p>
+                    <label class="flex items-center gap-3 text-sm cursor-pointer">
+                        <input type="radio" name="sort" value="" class="w-4 h-4"> RÉCENT
+                    </label>
+                    <label class="flex items-center gap-3 text-sm cursor-pointer">
+                        <input type="radio" name="sort" value="top" class="w-4 h-4"> POPULAIRE
+                    </label>
+                </div>
+
+                <div class="px-8 py-5 flex flex-col gap-3 max-h-96 overflow-y-auto">
+                    <p class="font-bold text-sm text-center">TAGS</p>
+                    <label class="flex items-center gap-3 text-sm cursor-pointer">
+                        <input type="checkbox" name="tag" value="jazz" class="w-4 h-4"> Jazz
+                    </label>
+                    <label class="flex items-center gap-3 text-sm cursor-pointer">
+                        <input type="checkbox" name="tag" value="rap" class="w-4 h-4"> Rap
+                    </label>
+                    <label class="flex items-center gap-3 text-sm cursor-pointer">
+                        <input type="checkbox" name="tag" value="rock" class="w-4 h-4"> Rock
+                    </label>
+                    <label class="flex items-center gap-3 text-sm cursor-pointer">
+                        <input type="checkbox" name="tag" value="classique" class="w-4 h-4"> Classique
+                    </label>
+                    <label class="flex items-center gap-3 text-sm cursor-pointer">
+                        <input type="checkbox" name="tag" value="electro" class="w-4 h-4"> Electro
+                    </label>
+                    <label class="flex items-center gap-3 text-sm cursor-pointer">
+                        <input type="checkbox" name="tag" value="rnb" class="w-4 h-4"> RnB
+                    </label>
+                    <label class="flex items-center gap-3 text-sm cursor-pointer">
+                        <input type="checkbox" name="tag" value="vinyle" class="w-4 h-4"> Vinyle
+                    </label>
+                    <label class="flex items-center gap-3 text-sm cursor-pointer">
+                        <input type="checkbox" name="tag" value="album" class="w-4 h-4"> Album
+                    </label>
+                    <label class="flex items-center gap-3 text-sm cursor-pointer">
+                        <input type="checkbox" name="tag" value="instrument" class="w-4 h-4"> Instrument
+                    </label>
+                    <label class="flex items-center gap-3 text-sm cursor-pointer">
+                        <input type="checkbox" name="tag" value="production" class="w-4 h-4"> Production
+                    </label>
+                </div>
+
+            </div>
+
+            <div class="px-5 py-4 border-t border-gray-200">
+                <button id="modal-filter-apply"
+                    class="w-full bg-black text-white py-2.5 text-sm font-bold hover:bg-gray-800">
+                    Appliquer
+                </button>
+            </div>
+        </div>
+
+    </div>
+</div>
+{{end}}
