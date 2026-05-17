@@ -67,4 +67,8 @@ summary { list-style: none; }
 .dark .text-gray-500 { color: #999; }
 .dark .text-gray-700 { color: #ccc; }
 .dark .hover\:bg-gray-50:hover { background-color: #222; }
+.dark .hover\:bg-gray-100:hover { background-color: #2a2a2a; }
 .dark .hover\:bg-gray-800:hover { background-color: #2a2a2a; }
+.dark #search-suggestions { background-color: #1a1a1a; border-color: #333; }
+.dark #search-suggestions a { border-color: #333; }
+.dark #search-suggestions .bg-gray-200 { background-color: #333; }

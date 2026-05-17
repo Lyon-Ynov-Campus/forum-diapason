@@ -12,7 +12,7 @@ import (
 var db *sql.DB
 
 func main() {
-	port   := getEnv("API_PORT", "8081")
+	port := getEnv("API_PORT", "8081")
 	dbFile := getEnv("DB_FILE", "./forum.db")
 
 	db = database.Init(dbFile)
@@ -24,16 +24,18 @@ func main() {
 
 	// Auth
 	mux.HandleFunc("/api/auth/register", authRegister)
-	mux.HandleFunc("/api/auth/login",    authLogin)
-	mux.HandleFunc("/api/auth/logout",   authLogout)
-	mux.HandleFunc("/api/auth/me",       authMe)
+	mux.HandleFunc("/api/auth/login", authLogin)
+	mux.HandleFunc("/api/auth/logout", authLogout)
+	mux.HandleFunc("/api/auth/me", authMe)
+	mux.HandleFunc("/api/auth/forgot-password", authForgotPassword)
+	mux.HandleFunc("/api/auth/reset-password",  authResetPassword)
 
 	// Profil
-	mux.HandleFunc("/api/profile",          profileUpdate)
+	mux.HandleFunc("/api/profile", profileUpdate)
 	mux.HandleFunc("/api/profile/password", profilePassword)
 
 	// Posts
-	mux.HandleFunc("/api/posts",  handlers.Posts)
+	mux.HandleFunc("/api/posts", handlers.Posts)
 	mux.HandleFunc("/api/posts/", postsRouter)
 
 	// Comments
@@ -41,6 +43,9 @@ func main() {
 
 	// Tags
 	mux.HandleFunc("/api/tags", handlers.Tags)
+
+	// Search
+	mux.HandleFunc("/api/search", handlers.Search)
 
 	// Users
 	mux.HandleFunc("/api/users/", usersRouter)

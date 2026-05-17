@@ -206,7 +206,6 @@ func resizeToSquare(src image.Image, size int) image.Image {
 	return out
 }
 
-
 // DeleteUser supprime le compte apres verification du mdp
 // Les FK en ON DELETE CASCADE (sessions, posts, comments, likes, follows,
 // post_tags via posts) s'occupent du nettoyage en base
@@ -242,4 +241,74 @@ func GetUserByID(db *sql.DB, userID int) (*models.User, error) {
 		return nil, errors.New("utilisateur introuvable")
 	}
 	return user, nil
+}
+
+const PostImageDir = "./public/posts"
+const PostImageMaxWidth = 800 // px
+
+// UploadPostImage enregistre une image pour un post et met à jour image_url en base
+func UploadPostImage(db *sql.DB, postID int, file multipart.File, header *multipart.FileHeader) (string, error) {
+	if header.Size > AvatarMaxSize {
+		return "", fmt.Errorf("image trop lourde (max %d Mo)", AvatarMaxSize>>20)
+	}
+	if err := os.MkdirAll(PostImageDir, 0755); err != nil {
+		return "", errors.New("erreur création dossier")
+	}
+
+	img, _, err := image.Decode(file)
+	if err != nil {
+		return "", errors.New("format non supporté (jpg, png, webp)")
+	}
+
+	// Redimensionner si l'image est trop large
+	bounds := img.Bounds()
+	if bounds.Dx() > PostImageMaxWidth {
+		ratio := float64(bounds.Dy()) / float64(bounds.Dx())
+		newHeight := int(float64(PostImageMaxWidth) * ratio)
+		out := image.NewRGBA(image.Rect(0, 0, PostImageMaxWidth, newHeight))
+		draw.CatmullRom.Scale(out, out.Bounds(), img, bounds, draw.Over, nil)
+		img = out
+	}
+
+	filename := fmt.Sprintf("%d.png", postID)
+	dest, err := os.Create(filepath.Join(PostImageDir, filename))
+	if err != nil {
+		return "", err
+	}
+	defer dest.Close()
+	if err := png.Encode(dest, img); err != nil {
+		return "", err
+	}
+
+	webPath := fmt.Sprintf("/posts/%s?v=%d", filename, time.Now().Unix())
+	_, err = db.Exec(`UPDATE posts SET image_url = ? WHERE id = ?`, webPath, postID)
+	return webPath, err
+}
+
+func SearchUsers(db *sql.DB, q string, limit int) ([]*models.User, error) {
+	q = strings.TrimSpace(q)
+	if q == "" {
+		return nil, nil
+	}
+	like := "%" + strings.ToLower(q) + "%"
+	rows, err := db.Query(
+		`SELECT id, nom, pseudo, email, photo_url, created_at
+		 FROM users
+		 WHERE LOWER(pseudo) LIKE ? OR LOWER(nom) LIKE ?
+		 ORDER BY pseudo ASC
+		 LIMIT ?`, like, like, limit,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var users []*models.User
+	for rows.Next() {
+		u := &models.User{}
+		if err := rows.Scan(&u.ID, &u.Nom, &u.Pseudo, &u.Email, &u.PhotoURL, &u.CreatedAt); err != nil {
+			continue
+		}
+		users = append(users, u)
+	}
+	return users, nil
 }

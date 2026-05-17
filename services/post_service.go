@@ -34,7 +34,7 @@ func CreatePost(db *sql.DB, userID int, titre, contenu, mediaType string) (*mode
 func GetPost(db *sql.DB, postID, currentUserID int) (*models.Post, error) {
 	post := &models.Post{}
 	err := db.QueryRow(`
-		SELECT p.id, p.user_id, p.titre, p.contenu, p.media_type, p.date_publication,
+		SELECT p.id, p.user_id, p.titre, p.contenu, p.media_type, p.image_url, p.date_publication,
 		       u.pseudo, u.photo_url,
 		       (SELECT COUNT(*) FROM likes    WHERE post_id  = p.id) AS like_count,
 		       (SELECT COUNT(*) FROM comments WHERE posts_id = p.id) AS comment_count,
@@ -42,7 +42,7 @@ func GetPost(db *sql.DB, postID, currentUserID int) (*models.Post, error) {
 		FROM posts p JOIN users u ON u.id = p.user_id
 		WHERE p.id = ?`, currentUserID, postID,
 	).Scan(&post.ID, &post.UserID, &post.Titre, &post.Contenu,
-		&post.MediaType, &post.DatePublication,
+		&post.MediaType, &post.ImageURL, &post.DatePublication,
 		&post.AuthorPseudo, &post.AuthorPhoto,
 		&post.LikeCount, &post.CommentCount, &post.LikedByMe)
 	if err != nil {
@@ -54,7 +54,7 @@ func GetPost(db *sql.DB, postID, currentUserID int) (*models.Post, error) {
 
 func GetPosts(db *sql.DB, currentUserID, limit, offset int) ([]*models.Post, error) {
 	rows, err := db.Query(`
-		SELECT p.id, p.user_id, p.titre, p.contenu, p.media_type, p.date_publication,
+		SELECT p.id, p.user_id, p.titre, p.contenu, p.media_type, p.image_url, p.date_publication,
 		       u.pseudo, u.photo_url,
 		       (SELECT COUNT(*) FROM likes    WHERE post_id  = p.id) AS like_count,
 		       (SELECT COUNT(*) FROM comments WHERE posts_id = p.id) AS comment_count,
@@ -70,7 +70,34 @@ func GetPosts(db *sql.DB, currentUserID, limit, offset int) ([]*models.Post, err
 	for rows.Next() {
 		p := &models.Post{}
 		rows.Scan(&p.ID, &p.UserID, &p.Titre, &p.Contenu,
-			&p.MediaType, &p.DatePublication,
+			&p.MediaType, &p.ImageURL, &p.DatePublication,
+			&p.AuthorPseudo, &p.AuthorPhoto,
+			&p.LikeCount, &p.CommentCount, &p.LikedByMe)
+		p.Tags = GetPostTags(db, p.ID)
+		posts = append(posts, p)
+	}
+	return posts, nil
+}
+
+func GetTopPosts(db *sql.DB, currentUserID, limit int) ([]*models.Post, error) {
+	rows, err := db.Query(`
+		SELECT p.id, p.user_id, p.titre, p.contenu, p.media_type, p.image_url, p.date_publication,
+		       u.pseudo, u.photo_url,
+		       (SELECT COUNT(*) FROM likes    WHERE post_id  = p.id) AS like_count,
+		       (SELECT COUNT(*) FROM comments WHERE posts_id = p.id) AS comment_count,
+		       (SELECT COUNT(*) FROM likes    WHERE post_id  = p.id AND user_id = ?) AS liked_by_me
+		FROM posts p JOIN users u ON u.id = p.user_id
+		ORDER BY (SELECT COUNT(*) FROM likes WHERE post_id = p.id) DESC
+		LIMIT ?`, currentUserID, limit)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var posts []*models.Post
+	for rows.Next() {
+		p := &models.Post{}
+		rows.Scan(&p.ID, &p.UserID, &p.Titre, &p.Contenu,
+			&p.MediaType, &p.ImageURL, &p.DatePublication,
 			&p.AuthorPseudo, &p.AuthorPhoto,
 			&p.LikeCount, &p.CommentCount, &p.LikedByMe)
 		p.Tags = GetPostTags(db, p.ID)
@@ -237,7 +264,7 @@ func GetAllTags(db *sql.DB) ([]*models.Tag, error) {
 
 func GetPostsByTag(db *sql.DB, tagNom string, currentUserID int) ([]*models.Post, error) {
 	rows, err := db.Query(`
-		SELECT p.id, p.user_id, p.titre, p.contenu, p.media_type, p.date_publication,
+		SELECT p.id, p.user_id, p.titre, p.contenu, p.media_type, p.image_url, p.date_publication,
 		       u.pseudo, u.photo_url,
 		       (SELECT COUNT(*) FROM likes    WHERE post_id  = p.id) AS like_count,
 		       (SELECT COUNT(*) FROM comments WHERE posts_id = p.id) AS comment_count,
@@ -255,7 +282,7 @@ func GetPostsByTag(db *sql.DB, tagNom string, currentUserID int) ([]*models.Post
 	for rows.Next() {
 		p := &models.Post{}
 		rows.Scan(&p.ID, &p.UserID, &p.Titre, &p.Contenu,
-			&p.MediaType, &p.DatePublication,
+			&p.MediaType, &p.ImageURL, &p.DatePublication,
 			&p.AuthorPseudo, &p.AuthorPhoto,
 			&p.LikeCount, &p.CommentCount, &p.LikedByMe)
 		p.Tags = GetPostTags(db, p.ID)
@@ -324,7 +351,7 @@ func scanUsers(rows *sql.Rows) ([]*models.User, error) {
 
 func GetPostsByUser(db *sql.DB, authorID, currentUserID, limit, offset int) ([]*models.Post, error) {
 	rows, err := db.Query(`
-		SELECT p.id, p.user_id, p.titre, p.contenu, p.media_type, p.date_publication,
+		SELECT p.id, p.user_id, p.titre, p.contenu, p.media_type, p.image_url, p.date_publication,
 		       u.pseudo, u.photo_url,
 		       (SELECT COUNT(*) FROM likes    WHERE post_id  = p.id) AS like_count,
 		       (SELECT COUNT(*) FROM comments WHERE posts_id = p.id) AS comment_count,
@@ -341,7 +368,73 @@ func GetPostsByUser(db *sql.DB, authorID, currentUserID, limit, offset int) ([]*
 	for rows.Next() {
 		p := &models.Post{}
 		rows.Scan(&p.ID, &p.UserID, &p.Titre, &p.Contenu,
-			&p.MediaType, &p.DatePublication,
+			&p.MediaType, &p.ImageURL, &p.DatePublication,
+			&p.AuthorPseudo, &p.AuthorPhoto,
+			&p.LikeCount, &p.CommentCount, &p.LikedByMe)
+		p.Tags = GetPostTags(db, p.ID)
+		posts = append(posts, p)
+	}
+	return posts, nil
+}
+
+func SearchPosts(db *sql.DB, currentUserID int, q, sort string, tags []string, limit, offset int) ([]*models.Post, error) {
+	where := []string{}
+	args := []any{currentUserID}
+
+	if strings.TrimSpace(q) != "" {
+		like := "%" + strings.ToLower(strings.TrimSpace(q)) + "%"
+		where = append(where, `(
+			LOWER(p.titre)   LIKE ? OR
+			LOWER(p.contenu) LIKE ? OR
+			p.id IN (SELECT pt.post_id FROM post_tags pt JOIN tags t ON t.id = pt.tag_id WHERE LOWER(t.nom) LIKE ?)
+		)`)
+		args = append(args, like, like, like)
+	}
+
+	if len(tags) > 0 {
+		placeholders := strings.Repeat("?,", len(tags))
+		placeholders = placeholders[:len(placeholders)-1]
+		where = append(where, "p.id IN (SELECT pt.post_id FROM post_tags pt JOIN tags t ON t.id = pt.tag_id WHERE LOWER(t.nom) IN ("+placeholders+"))")
+		for _, t := range tags {
+			args = append(args, strings.ToLower(strings.TrimSpace(t)))
+		}
+	}
+
+	order := "p.date_publication DESC"
+	switch sort {
+	case "top":
+		order = "like_count DESC, p.date_publication DESC"
+	case "hot":
+		order = "(like_count + comment_count) DESC, p.date_publication DESC"
+	}
+
+	whereClause := ""
+	if len(where) > 0 {
+		whereClause = " WHERE " + strings.Join(where, " AND ")
+	}
+
+	query := `
+		SELECT p.id, p.user_id, p.titre, p.contenu, p.media_type, p.image_url, p.date_publication,
+		       u.pseudo, u.photo_url,
+		       (SELECT COUNT(*) FROM likes    WHERE post_id  = p.id) AS like_count,
+		       (SELECT COUNT(*) FROM comments WHERE posts_id = p.id) AS comment_count,
+		       (SELECT COUNT(*) FROM likes    WHERE post_id  = p.id AND user_id = ?) AS liked_by_me
+		FROM posts p JOIN users u ON u.id = p.user_id` + whereClause + `
+		ORDER BY ` + order + `
+		LIMIT ? OFFSET ?`
+
+	args = append(args, limit, offset)
+	rows, err := db.Query(query, args...)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var posts []*models.Post
+	for rows.Next() {
+		p := &models.Post{}
+		rows.Scan(&p.ID, &p.UserID, &p.Titre, &p.Contenu,
+			&p.MediaType, &p.ImageURL, &p.DatePublication,
 			&p.AuthorPseudo, &p.AuthorPhoto,
 			&p.LikeCount, &p.CommentCount, &p.LikedByMe)
 		p.Tags = GetPostTags(db, p.ID)

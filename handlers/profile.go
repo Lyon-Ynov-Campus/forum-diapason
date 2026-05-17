@@ -3,6 +3,7 @@ package handlers
 // Pages du profil : affichage + modification (infos, avatar, mdp)
 
 import (
+	"fmt"
 	"net/http"
 	"net/url"
 
@@ -10,12 +11,33 @@ import (
 	"forum-diapason/services"
 )
 
-// GET /profile  → affiche le profil du user co (redirige vers /login sinon)
+// GET /profile       → profil du user connecté
+// GET /profile?id=2  → profil d'un autre utilisateur
 func ProfilePage(w http.ResponseWriter, r *http.Request) {
 	if RequirePageAuth(w, r) == 0 {
 		return
 	}
-	RenderPage(w, r, "profile", nil)
+
+	var profileUser *models.User
+
+	if idStr := r.URL.Query().Get("id"); idStr != "" {
+		var userID int
+		if _, err := fmt.Sscanf(idStr, "%d", &userID); err == nil {
+			profileUser, _ = services.GetUserByID(db, userID)
+		}
+	}
+
+	// Pas d'id ou user introuvable → on affiche le user connecté
+	if profileUser == nil {
+		profileUser = currentUser(r)
+	}
+
+	loggedIn := currentUser(r)
+	isOwn := loggedIn != nil && profileUser != nil && loggedIn.ID == profileUser.ID
+	RenderPage(w, r, "profile", map[string]any{
+		"ProfileUser": profileUser,
+		"IsOwnProfile": isOwn,
+	})
 }
 
 // GET  /profile/edit  → form pre-rempli avec les valeurs actuelles
@@ -57,7 +79,7 @@ func ProfileEditPage(w http.ResponseWriter, r *http.Request) {
 		RenderPage(w, r, "profile-edit", form)
 		return
 	}
-	http.Redirect(w, r, "/profile", http.StatusSeeOther)
+	http.Redirect(w, r, fmt.Sprintf("/profile?id=%d", user.ID), http.StatusSeeOther)
 }
 
 // POST /profile/avatar  → upload d'une nouvelle photo de profil (multipart)
@@ -91,7 +113,7 @@ func ProfileAvatarPage(w http.ResponseWriter, r *http.Request) {
 		rerenderAvatarErr(w, r, user, err.Error())
 		return
 	}
-	http.Redirect(w, r, "/profile", http.StatusSeeOther)
+	http.Redirect(w, r, fmt.Sprintf("/profile?id=%d", user.ID), http.StatusSeeOther)
 }
 
 // POST /profile/avatar/delete  → supprime la photo de profil (fichier + DB)
@@ -110,7 +132,7 @@ func ProfileAvatarDeletePage(w http.ResponseWriter, r *http.Request) {
 		rerenderAvatarErr(w, r, user, err.Error())
 		return
 	}
-	http.Redirect(w, r, "/profile", http.StatusSeeOther)
+	http.Redirect(w, r, fmt.Sprintf("/profile?id=%d", user.ID), http.StatusSeeOther)
 }
 
 // POST /profile/password  → change le mdp (ancien + nouveau + confirmation)
@@ -146,7 +168,7 @@ func ProfilePasswordPage(w http.ResponseWriter, r *http.Request) {
 		rerender(err.Error())
 		return
 	}
-	http.Redirect(w, r, "/profile", http.StatusSeeOther)
+	http.Redirect(w, r, fmt.Sprintf("/profile?id=%d", user.ID), http.StatusSeeOther)
 }
 
 // POST /profile/delete  → supprime le compte apres verification du mdp

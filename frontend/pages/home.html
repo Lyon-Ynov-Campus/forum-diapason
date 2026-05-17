@@ -8,15 +8,15 @@
 </head>
 <body>
     {{template "header" .}}
-    {{template "menu-burger" .}}
     {{template "modal-edit-profile" .}}
     {{template "modal-contacts" .}}
     {{template "modal-filter" .}}
     {{template "modal-settings" .}}
+    {{template "modal-crop" .}}
     {{template "post-card" .}}
     {{template "top-post-card" .}}
 
-    <div class="grid grid-cols-[200px_1fr_200px] gap-4 px-6 py-6">
+    <div class="grid grid-cols-[300px_minmax(0,1fr)_280px] gap-8 px-8 py-6 max-w-[1600px] mx-auto">
 
         <!-- Colonne gauche : créer un post -->
         {{template "create-post" .}}

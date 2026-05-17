@@ -42,6 +42,12 @@ func main() {
 	})
 	http.HandleFunc("/login", handlers.LoginPage)
 	http.HandleFunc("/register", handlers.RegisterPage)
+	http.HandleFunc("/forgot-password", func(w http.ResponseWriter, r *http.Request) {
+		handlers.RenderPage(w, r, "forgot-password", nil)
+	})
+	http.HandleFunc("/reset-password", func(w http.ResponseWriter, r *http.Request) {
+		handlers.RenderPage(w, r, "reset-password", nil)
+	})
 	http.HandleFunc("/logout", handlers.LogoutPage)
 	http.HandleFunc("/profile", handlers.ProfilePage)
 	http.HandleFunc("/profile/edit", handlers.ProfileEditPage)
@@ -61,6 +67,7 @@ func main() {
 	http.Handle("/js/", http.FileServer(http.Dir("./frontend/")))
 	http.Handle("/data/", http.FileServer(http.Dir("./frontend/")))
 	http.Handle("/avatars/", http.FileServer(http.Dir("./public/")))
+	http.Handle("/posts/", http.FileServer(http.Dir("./public/")))
 	http.Handle("/image/", http.FileServer(http.Dir("./public/")))
 
 	log.Println("Serveur lancé sur http://localhost:" + port)
